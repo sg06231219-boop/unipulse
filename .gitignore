@@ -1,0 +1,10 @@
+*.db
+*.log
+__pycache__/
+node_modules/
+generate_seed.py
+count_unis.py
+debug_port.ps1
+verify.py
+test_*.py
+quick_test.py

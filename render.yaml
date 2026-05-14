@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: unipulse
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
