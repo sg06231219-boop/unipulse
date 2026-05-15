@@ -3,159 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UniPulse - 全球高校风向标</title>
+<title>UniPulse — 全球高校数据平台</title>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--card2:#253349;--border:#334155;--text:#f1f5f9;--soft:#94a3b8;--gold:#fbbf24;--blue:#3b82f6;--green:#22c55e;--red:#ef4444;--purple:#a855f7;--orange:#f97316;--pink:#ec4899;--cyan:#06b6d4}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
-a{color:var(--blue);text-decoration:none}
-button{cursor:pointer;font:inherit;border:none;border-radius:8px;padding:8px 16px;transition:opacity .2s}
-button:hover{opacity:.85}
-input,select,textarea{font:inherit;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 12px;outline:none;width:100%}
-input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+:root{--bg:#0a0e1a;--bg2:#0f1325;--card:rgba(255,255,255,.04);--card2:rgba(255,255,255,.07);--border:rgba(255,255,255,.08);--text:#e2e8f0;--soft:#64748b;--gold:#f59e0b;--blue:#3b82f6;--cyan:#06b6d4;--purple:#8b5cf6;--green:#10b981;--red:#ef4444;--pink:#ec4899}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden}
 
-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:12px;height:52px;position:sticky;top:0;z-index:100}
-nav .logo{font-size:18px;font-weight:700;color:var(--gold);cursor:pointer;white-space:nowrap}
-nav .tabs{display:flex;gap:2px;flex:1;overflow-x:auto}
-nav .tabs button{background:transparent;color:var(--soft);padding:6px 12px;font-size:13px;border-radius:6px;white-space:nowrap}
-nav .tabs button.active{background:var(--blue);color:#fff}
-nav .user-area{display:flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap}
-nav .user-area .login-btn{background:var(--blue);color:#fff;padding:5px 14px;font-size:12px}
-nav .user-area .username{color:var(--gold);font-weight:600}
-nav .user-area .logout-btn{background:transparent;color:var(--soft);font-size:12px;padding:5px 8px}
+/* ── Nav ── */
+nav{background:rgba(15,23,42,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:20px;height:60px;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;letter-spacing:-.5px;white-space:nowrap}
+.tabs{display:flex;gap:2px;flex:1}
+.tabs button{background:transparent;color:var(--soft);padding:6px 16px;font-size:13px;font-weight:500;border-radius:8px;transition:all .2s;white-space:nowrap}
+.tabs button:hover{color:var(--text);background:var(--card2)}
+.tabs button.active{background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(139,92,246,.2));color:#fff;box-shadow:0 0 20px rgba(59,130,246,.15)}
+.user-area{display:flex;align-items:center;gap:10px;font-size:13px}
+.user-area .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:700}
+.user-area .uname{color:var(--gold);font-weight:600;font-size:12px}
+.user-area button{font-size:12px;padding:5px 14px;border-radius:6px}
 
-main{max-width:1200px;margin:0 auto;padding:16px}
-.page{display:none}.page.active{display:block}
+/* ── Main ── */
+main{max-width:1280px;margin:0 auto;padding:0 24px 40px}
 
-.hero{text-align:center;padding:30px 16px 20px}
-.hero h1{font-size:24px;margin-bottom:6px}
-.hero p{color:var(--soft);margin-bottom:16px;font-size:14px}
-.search-box{display:flex;gap:8px;max-width:520px;margin:0 auto}
-.search-box input{flex:1;padding:9px 14px;font-size:14px}
-.search-box button{background:var(--blue);color:#fff;padding:9px 18px;white-space:nowrap}
+/* ── Hero ── */
+.hero{text-align:center;padding:56px 20px 40px;position:relative}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(59,130,246,.08) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-size:40px;font-weight:800;margin-bottom:8px;letter-spacing:-1px}
+.hero h1 .grad{background:linear-gradient(135deg,var(--gold),var(--orange),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--soft);font-size:15px;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto}
+.search-box{display:flex;gap:10px;max-width:600px;margin:0 auto;position:relative}
+.search-box input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:14px;color:var(--text);transition:all .2s;outline:none}
+.search-box input:focus{border-color:rgba(59,130,246,.5);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.search-box input::placeholder{color:var(--soft)}
+.search-btn{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 4px 15px rgba(59,130,246,.3);transition:all .2s;white-space:nowrap}
+.search-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.4)}
 
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:center}
-.filters select{padding:5px 8px;font-size:12px;width:auto}
-.stat{color:var(--soft);font-size:12px;margin-left:auto}
+/* ── Filters ── */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 16px;align-items:center}
+.filters select{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text);cursor:pointer;outline:none}
+.filters select:focus{border-color:var(--blue)}
+.stat-chip{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--soft);margin-left:auto}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:transform .12s,border-color .12s}
-.card:hover{transform:translateY(-2px);border-color:var(--blue)}
-.card-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.logo-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;color:#fff}
-.card-info h3{font-size:14px;margin-bottom:1px}.card-info .loc{font-size:11px;color:var(--soft)}
-.card-score{margin-left:auto;text-align:center}
-.card-score .num{font-size:20px;font-weight:700;color:var(--gold)}.card-score .label{font-size:9px;color:var(--soft)}
-.tags{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}
-.tag{font-size:10px;padding:1px 7px;border-radius:10px;background:rgba(59,130,246,.12);color:var(--blue)}
-.metrics{display:flex;gap:10px;font-size:11px;color:var(--soft)}.metrics span b{color:var(--text)}
+/* ── Cards Grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,rgba(59,130,246,.05),rgba(139,92,246,.05));opacity:0;transition:opacity .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(59,130,246,.3);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.card:hover::before{opacity:1}
+.card-top{display:flex;align-items:center;gap:14px;margin-bottom:12px;position:relative}
+.logo-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.card-info h3{font-size:15px;font-weight:700;margin-bottom:2px;line-height:1.3}
+.card-info .loc{font-size:11px;color:var(--soft)}
+.card-score{margin-left:auto;text-align:center;position:relative}
+.card-score .num{font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.card-score .label{font-size:9px;color:var(--soft)}
+.card .tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.card .tag{font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.15)}
+.card .metrics{display:flex;gap:14px;font-size:11px;color:var(--soft)}
+.card .metrics b{color:var(--text);font-weight:600}
 
-.load-more{text-align:center;margin:20px 0}
-.load-more button{background:var(--card);color:var(--blue);border:1px solid var(--border);padding:8px 28px;font-size:13px}
+.load-more{text-align:center;margin:28px 0}
+.load-btn{background:var(--card);border:1px solid var(--border);color:var(--blue);padding:10px 32px;border-radius:10px;font-size:13px;font-weight:600;transition:all .2s}
+.load-btn:hover{background:rgba(59,130,246,.1);border-color:var(--blue)}
 
-.rank-table{width:100%;border-collapse:collapse}
-.rank-table th,.rank-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:12px}
-.rank-table th{color:var(--soft);font-weight:500}
-.rank-table tr{cursor:pointer;transition:background .12s}.rank-table tr:hover{background:var(--card)}
-.rank-pos{font-weight:700;color:var(--gold)}
+/* ── Table ── */
+.rank-table{width:100%;border-collapse:separate;border-spacing:0 4px;margin-top:8px}
+.rank-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.5px}
+.rank-table td{padding:10px 14px;font-size:13px;background:var(--card);border:none}
+.rank-table tr td:first-child{border-radius:10px 0 0 10px}
+.rank-table tr td:last-child{border-radius:0 10px 10px 0}
+.rank-table tr{cursor:pointer;transition:all .2s}
+.rank-table tr:hover td{background:var(--card2)}
+.rank-pos{font-weight:800;font-size:15px}
+.rank-pos.hot{background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
-.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.prog-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
-.prog-card h4{margin-bottom:8px;font-size:14px}
-.prog-item{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
-.prog-rank{font-weight:700;color:var(--gold);width:26px}
+/* ── Programs ── */
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .25s}
+.prog-card:hover{border-color:rgba(59,130,246,.3);transform:translateY(-2px)}
+.prog-card h4{font-size:15px;font-weight:700;margin-bottom:12px}
+.prog-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.prog-rank{font-weight:700;color:var(--gold);width:28px}
 
-/* Forum */
-.forum-layout{display:grid;grid-template-columns:1fr 280px;gap:16px}
+/* ── Forum ── */
+.forum-layout{display:grid;grid-template-columns:1fr 260px;gap:20px}
 .forum-main{min-width:0}
-.forum-sidebar{display:flex;flex-direction:column;gap:12px}
-.forum-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.forum-header h2{font-size:18px}
-.forum-cats{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
-.forum-cats button{background:var(--card);color:var(--soft);border:1px solid var(--border);padding:4px 10px;font-size:11px;border-radius:14px}
-.forum-cats button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.post-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .12s}
-.post-card:hover{border-color:var(--blue)}
-.post-card h4{font-size:13px;margin-bottom:4px;line-height:1.4}
-.post-card .meta{font-size:11px;color:var(--soft);display:flex;gap:10px;flex-wrap:wrap}
-.post-card .cat-tag{font-size:10px;padding:1px 7px;border-radius:8px;background:rgba(168,85,247,.12);color:var(--purple)}
-.sidebar-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
-.sidebar-card h4{font-size:13px;margin-bottom:8px;color:var(--gold)}
-.sidebar-card .hot-item{font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);cursor:pointer;color:var(--text)}
-.sidebar-card .hot-item:hover{color:var(--blue)}
-.sidebar-card .hot-item:last-child{border-bottom:none}
+.forum-sidebar{display:flex;flex-direction:column;gap:14px}
+.forum-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.forum-header h2{font-size:20px;font-weight:700}
+.new-post-btn{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;padding:8px 18px;border-radius:10px;font-weight:600;font-size:13px;box-shadow:0 4px 15px rgba(59,130,246,.3);transition:all .2s}
+.new-post-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.4)}
+.cat-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.cat-pills button{background:var(--card);border:1px solid var(--border);color:var(--soft);padding:5px 14px;font-size:11px;border-radius:16px;transition:all .2s}
+.cat-pills button:hover{color:var(--text);border-color:rgba(255,255,255,.15)}
+.cat-pills button.active{background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(59,130,246,.2));color:#fff;border-color:rgba(139,92,246,.4);box-shadow:0 0 15px rgba(139,92,246,.15)}
+.post-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.post-card:hover{border-color:rgba(59,130,246,.3);background:var(--card2);transform:translateX(2px)}
+.post-card h4{font-size:14px;font-weight:600;margin-bottom:6px;line-height:1.4}
+.post-card .meta{font-size:11px;color:var(--soft);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.cat-badge{font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
 
-/* Post detail */
-.post-detail{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
-.post-detail h2{font-size:18px;margin-bottom:8px}
-.post-detail .post-meta{font-size:12px;color:var(--soft);margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap}
-.post-detail .post-body{font-size:14px;line-height:1.7;margin-bottom:16px;white-space:pre-wrap}
-.post-detail .post-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px}
-.comment-section{margin-top:16px}
-.comment-section h3{font-size:15px;margin-bottom:12px}
-.comment-item{background:var(--card2);border-radius:8px;padding:10px 12px;margin-bottom:8px}
-.comment-item .c-author{font-size:12px;font-weight:600;color:var(--cyan)}
-.comment-item .c-time{font-size:10px;color:var(--soft);margin-left:8px}
-.comment-item .c-text{font-size:13px;margin-top:4px;line-height:1.5;white-space:pre-wrap}
-.comment-item .c-actions{display:flex;gap:12px;margin-top:4px;font-size:11px;color:var(--soft)}
-.comment-item .c-actions button{background:transparent;color:var(--soft);font-size:11px;padding:2px 6px}
-.comment-item .c-actions button:hover{color:var(--gold)}
+.sidebar-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.sidebar-card h4{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.hot-item{font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;color:var(--text);transition:color .15s}
+.hot-item:hover{color:var(--blue)}
+.hot-item:last-child{border-bottom:none}
+
+/* ── Post Detail ── */
+.back-btn{background:var(--card);border:1px solid var(--border);color:var(--soft);padding:5px 14px;border-radius:8px;font-size:12px;margin-bottom:16px;transition:all .2s;cursor:pointer}
+.back-btn:hover{color:var(--text);border-color:rgba(255,255,255,.15)}
+.post-detail{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px}
+.post-detail h2{font-size:22px;font-weight:700;margin-bottom:12px;line-height:1.4}
+.post-meta{font-size:12px;color:var(--soft);display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.post-body{font-size:14px;line-height:1.8;margin-bottom:20px;white-space:pre-wrap;color:rgba(255,255,255,.85)}
+.post-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px}
+.ptag{font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.15)}
+.comment-section{margin-top:20px}
+.comment-section h3{font-size:15px;font-weight:700;margin-bottom:14px}
+.comment-item{background:var(--card2);border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--border)}
+.c-author{font-size:12px;font-weight:700;color:var(--cyan)}
+.c-time{font-size:10px;color:var(--soft);margin-left:8px}
+.c-text{font-size:13px;margin-top:6px;line-height:1.6;white-space:pre-wrap;color:rgba(255,255,255,.8)}
+.c-actions{display:flex;gap:10px;margin-top:6px}
+.c-actions button{background:transparent;color:var(--soft);font-size:11px;padding:2px 6px;transition:color .15s}
+.c-actions button:hover{color:var(--gold)}
 .reply-box{margin-top:16px}
-.reply-box textarea{min-height:80px;resize:vertical;margin-bottom:8px}
-.reply-box .reply-actions{display:flex;gap:8px}
-.reply-box .reply-actions button{font-size:13px}
-.reply-box .submit-btn{background:var(--blue);color:#fff}
-.reply-box .cancel-btn{background:var(--card);color:var(--soft);border:1px solid var(--border)}
+.reply-box textarea{width:100%;min-height:90px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:13px;resize:vertical;outline:none;font-family:inherit}
+.reply-box textarea:focus{border-color:rgba(59,130,246,.5)}
+.reply-actions{display:flex;gap:8px;margin-top:10px}
+.submit-reply{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;padding:7px 20px;border-radius:8px;font-weight:600;font-size:13px}
 
-/* Compose post */
-.compose-form{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
-.compose-form h3{margin-bottom:12px;font-size:16px}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:12px;color:var(--soft);margin-bottom:4px}
-.form-group input,.form-group select,.form-group textarea{font-size:13px}
-.form-group textarea{min-height:120px;resize:vertical}
-.form-actions{display:flex;gap:8px}
-.form-actions .submit-btn{background:var(--blue);color:#fff}
-.form-actions .cancel-btn{background:var(--card);color:var(--soft);border:1px solid var(--border)}
+/* ── Compose ── */
+.compose-form{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:700px;margin:0 auto}
+.compose-form h3{font-size:18px;font-weight:700;margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--soft);margin-bottom:6px;letter-spacing:.3px}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;font-family:inherit;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:rgba(59,130,246,.5);box-shadow:0 0 0 3px rgba(59,130,246,.08)}
+.form-group textarea{min-height:140px;resize:vertical}
+.form-actions{display:flex;gap:10px}
+.form-actions .submit-btn{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;padding:10px 28px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:0 4px 15px rgba(59,130,246,.3)}
+.form-actions .cancel-btn{background:var(--card);border:1px solid var(--border);color:var(--soft);padding:10px 28px;border-radius:10px;font-size:14px}
 
-/* Modal */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;justify-content:center;align-items:center;padding:16px}
+/* ── Modal ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(4px)}
 .modal-bg.open{display:flex}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:14px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;position:relative}
-.modal-close{position:absolute;top:10px;right:10px;background:transparent;color:var(--soft);font-size:18px;padding:4px 8px}
-.modal h2{font-size:18px;margin-bottom:14px}
-.metric-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px}
-.metric-row .label{width:70px;text-align:right;flex-shrink:0}
-.metric-row .bar-bg{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
-.metric-row .bar-fill{height:100%;border-radius:3px}
-.metric-row .val{width:28px;font-weight:600}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;max-width:720px;width:100%;max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.modal-close{position:absolute;top:12px;right:12px;background:var(--card);border:1px solid var(--border);color:var(--soft);font-size:16px;padding:4px 10px;border-radius:8px;cursor:pointer;transition:all .2s}
+.modal-close:hover{color:var(--text);background:var(--card2)}
+.modal h2{font-size:20px;font-weight:700;margin-bottom:16px}
+.metric-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px}
+.metric-row .mlabel{width:78px;text-align:right;flex-shrink:0;color:var(--soft);font-weight:500}
+.metric-row .mbar{flex:1;height:8px;background:var(--card);border-radius:4px;overflow:hidden}
+.metric-row .mbar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.metric-row .mval{width:30px;font-weight:700;font-size:12px}
 
-/* Auth modal */
-.auth-modal .modal{max-width:380px}
-.auth-modal .form-group{margin-bottom:10px}
-.auth-modal h2{text-align:center}
-.auth-switch{text-align:center;font-size:12px;color:var(--soft);margin-top:8px}
-.auth-switch a{color:var(--blue);cursor:pointer}
+/* ── Auth ── */
+.auth-modal .modal{max-width:400px}
+.auth-modal h2{text-align:center;margin-bottom:20px;font-size:20px}
+.auth-switch{text-align:center;font-size:12px;color:var(--soft);margin-top:12px}
+.auth-switch a{color:var(--blue);cursor:pointer;font-weight:600}
 
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--blue);color:var(--text);padding:8px 18px;border-radius:8px;font-size:12px;opacity:0;transition:opacity .3s;z-index:300}
-.toast.show{opacity:1}
-.spinner{text-align:center;padding:16px;color:var(--soft);font-size:13px}
-.back-btn{background:transparent;color:var(--soft);font-size:13px;padding:4px 8px;margin-bottom:8px}
-.back-btn:hover{color:var(--text)}
+/* ── Toast ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--blue);color:var(--text);padding:10px 22px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;z-index:300;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 
-@media(max-width:768px){
+.spinner{text-align:center;padding:24px;color:var(--soft);font-size:13px}
+.empty-state{text-align:center;padding:48px 20px;color:var(--soft);font-size:14px}
+
+@media(max-width:900px){
   .forum-layout{grid-template-columns:1fr}
   .forum-sidebar{order:-1}
+  nav{padding:0 14px;gap:8px}
+  .tabs button{padding:5px 10px;font-size:12px}
+  .hero h1{font-size:28px}
+  main{padding:0 12px 30px}
+}
+@media(max-width:600px){
   .grid{grid-template-columns:1fr}
   .search-box{flex-direction:column}
-  nav{padding:0 10px;gap:6px}
-  nav .tabs button{padding:5px 8px;font-size:12px}
+  .hero h1{font-size:24px}
 }
 </style>
 </head>
 <body>
+
 <nav>
-  <div class="logo" id="logoHome">🎓 UniPulse</div>
+  <div class="logo" id="logoHome">UniPulse</div>
   <div class="tabs">
     <button class="active" data-page="discover">🏫 发现</button>
     <button data-page="rankings">📊 排名</button>
@@ -163,7 +196,7 @@ main{max-width:1200px;margin:0 auto;padding:16px}
     <button data-page="forum">💬 论坛</button>
   </div>
   <div class="user-area" id="userArea">
-    <button class="login-btn" id="loginBtn">登录</button>
+    <button class="login-btn" id="loginBtn" style="background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;box-shadow:0 4px 15px rgba(59,130,246,.3)">登录 / 注册</button>
   </div>
 </nav>
 
@@ -171,259 +204,232 @@ main{max-width:1200px;margin:0 auto;padding:16px}
   <!-- Discover -->
   <div class="page active" id="page-discover">
     <div class="hero">
-      <h1>找到最适合你的那所大学</h1>
-      <p>全球高校评价与社区讨论平台</p>
+      <h1>找到最适合你的<span class="grad">大学</span></h1>
+      <p>573 所全球高校 · 8 维评分体系 · 真实社区讨论</p>
       <div class="search-box">
-        <input id="searchInput" type="search" placeholder="搜索大学名称、国家、专业...">
-        <button id="searchBtn">🔍 搜索</button>
+        <input id="searchInput" type="search" placeholder="搜索大学名称、国家、专业方向...">
+        <button class="search-btn" id="searchBtn">搜索</button>
       </div>
     </div>
     <div class="filters">
       <select id="regionFilter">
-        <option value="all">全部地区</option>
-        <option value="北美">北美</option><option value="欧洲">欧洲</option>
-        <option value="亚洲">亚洲</option><option value="大洋洲">大洋洲</option>
-        <option value="南美">南美</option><option value="非洲">非洲</option>
+        <option value="all">🌍 全部地区</option>
+        <option value="北美">🇺🇸 北美</option>
+        <option value="欧洲">🇪🇺 欧洲</option>
+        <option value="亚洲">🇨🇳 亚洲</option>
+        <option value="大洋洲">🇦🇺 大洋洲</option>
+        <option value="南美">🇧🇷 南美</option>
+        <option value="非洲">🌍 非洲</option>
       </select>
-      <span class="stat" id="resultStat"></span>
+      <span class="stat-chip" id="resultStat">加载中...</span>
     </div>
     <div class="grid" id="uniGrid"></div>
-    <div class="load-more" id="loadMoreWrap" style="display:none"><button id="loadMoreBtn">加载更多</button></div>
+    <div class="load-more" id="loadMoreWrap" style="display:none"><button class="load-btn" id="loadMoreBtn">加载更多</button></div>
     <div class="spinner" id="discoverSpinner" style="display:none">加载中...</div>
   </div>
 
   <!-- Rankings -->
   <div class="page" id="page-rankings">
-    <h2 style="margin-bottom:12px">🏆 全球高校综合排名</h2>
+    <div style="padding:32px 0 16px">
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">🏆 全球高校综合排名</h2>
+      <p style="color:var(--soft);font-size:13px">基于 8 维评分体系综合计算，实时更新</p>
+    </div>
     <div id="rankContent"></div>
     <div class="spinner" id="rankSpinner" style="display:none">加载中...</div>
   </div>
 
   <!-- Programs -->
   <div class="page" id="page-programs">
-    <h2 style="margin-bottom:12px">🎓 学科专业排名</h2>
+    <div style="padding:32px 0 16px">
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">🎓 学科专业排名</h2>
+      <p style="color:var(--soft);font-size:13px">各热门学科领域顶尖高校推荐</p>
+    </div>
     <div class="prog-grid" id="progGrid"></div>
   </div>
 
   <!-- Forum -->
   <div class="page" id="page-forum">
-    <div id="forumContainer">
-      <!-- Forum list view -->
-      <div id="forumListView">
-        <div class="forum-header">
-          <h2>💬 社区讨论</h2>
-          <button style="background:var(--blue);color:#fff;font-size:13px" id="newPostBtn">✏️ 发布话题</button>
-        </div>
-        <div class="forum-cats" id="forumCats"></div>
-        <div class="forum-layout">
-          <div class="forum-main" id="forumList"></div>
-          <div class="forum-sidebar" id="forumSidebar"></div>
-        </div>
+    <div id="forumListView">
+      <div class="forum-header">
+        <h2>💬 社区讨论</h2>
+        <button class="new-post-btn" id="newPostBtn">✏️ 发布话题</button>
       </div>
-      <!-- Post detail view -->
-      <div id="forumDetailView" style="display:none">
-        <button class="back-btn" id="backToList">← 返回列表</button>
-        <div id="postDetailContent"></div>
+      <div class="cat-pills" id="forumCats"></div>
+      <div class="forum-layout">
+        <div class="forum-main" id="forumList"></div>
+        <div class="forum-sidebar" id="forumSidebar"></div>
       </div>
-      <!-- Compose view -->
-      <div id="forumComposeView" style="display:none">
-        <button class="back-btn" id="backFromCompose">← 返回</button>
-        <div class="compose-form">
-          <h3>✏️ 发布新话题</h3>
-          <div class="form-group"><label>标题</label><input id="composeTitle" maxlength="100" placeholder="输入话题标题..."></div>
-          <div class="form-group"><label>分类</label><select id="composeCategory"></select></div>
-          <div class="form-group"><label>内容</label><textarea id="composeContent" placeholder="分享你的经验、观点或疑问..."></textarea></div>
-          <div class="form-group"><label>标签（逗号分隔）</label><input id="composeTags" placeholder="如: 就业,CS,美国"></div>
-          <div class="form-actions">
-            <button class="submit-btn" id="submitPost">发布</button>
-            <button class="cancel-btn" id="cancelPost">取消</button>
-          </div>
+    </div>
+    <div id="forumDetailView" style="display:none">
+      <button class="back-btn" id="backToList">← 返回列表</button>
+      <div id="postDetailContent"></div>
+    </div>
+    <div id="forumComposeView" style="display:none">
+      <button class="back-btn" id="backFromCompose">← 返回</button>
+      <div class="compose-form">
+        <h3>✏️ 发布新话题</h3>
+        <div class="form-group"><label>标题</label><input id="composeTitle" maxlength="100" placeholder="输入话题标题..."></div>
+        <div class="form-group"><label>分类</label><select id="composeCategory"></select></div>
+        <div class="form-group"><label>内容</label><textarea id="composeContent" placeholder="分享你的经验、观点或疑问...&#10;&#10;支持换行，内容会完整展示。"></textarea></div>
+        <div class="form-group"><label>标签（逗号分隔）</label><input id="composeTags" placeholder="如：就业,计算机科学,美国"></div>
+        <div class="form-actions">
+          <button class="submit-btn" id="submitPost">发布话题</button>
+          <button class="cancel-btn" id="cancelPost">取消</button>
         </div>
       </div>
     </div>
   </div>
 </main>
 
-<!-- Detail Modal (university) -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal" id="modalContent">
-    <button class="modal-close" id="modalClose">✕</button>
-    <div id="modalBody"></div>
-  </div>
-</div>
-
-<!-- Auth Modal -->
-<div class="modal-bg auth-modal" id="authModalBg">
-  <div class="modal" id="authModal">
-    <button class="modal-close" id="authClose">✕</button>
-    <div id="authBody"></div>
-  </div>
-</div>
+<!-- Modals -->
+<div class="modal-bg" id="modalBg"><div class="modal"><button class="modal-close" id="modalClose">✕</button><div id="modalBody"></div></div></div>
+<div class="modal-bg auth-modal" id="authModalBg"><div class="modal" id="authModal"><button class="modal-close" id="authClose">✕</button><div id="authBody"></div></div></div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
   var API='/api';
-  var TOKEN_KEY='unipulse_token';
-  var USER_KEY='unipulse_user';
-  var curPage='discover';
-  var uniPage=1,uniLoading=false,uniAllLoaded=false,curRegion='all',curSearch='';
+  var TKEY='unipulse_token',UKEY='unipulse_user';
+  var curPage='discover',uniPage=1,uniLoading=false,uniAll=false,curRegion='all',curSearch='';
   var forumCat='all',forumLoaded=false;
-  var currentUser=null;
-  var toastTimer=null;
+  var currentUser=null,toastTimer=null;
   var FORUM_CATS=['心理健康','校园生活','学术氛围','就业发展','人文关怀','留学申请','专业选择','院校对比','奖学金','实习','研究生','博士'];
 
   function $(id){return document.getElementById(id)}
   function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
   function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},2500)}
-  function getToken(){return localStorage.getItem(TOKEN_KEY)||''}
-  function saveUser(u){localStorage.setItem(USER_KEY,JSON.stringify(u));currentUser=u;updateUserArea()}
-  function loadUser(){try{var u=JSON.parse(localStorage.getItem(USER_KEY));if(u)currentUser=u}catch(e){}updateUserArea()}
-  function logout(){localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(USER_KEY);currentUser=null;updateUserArea();toast('已退出登录')}
-  function authHeaders(){var t=getToken();return t?{'Authorization':'Bearer '+t}:{}}
+  function getToken(){return localStorage.getItem(TKEY)||''}
+  function saveUser(u){localStorage.setItem(UKEY,JSON.stringify(u));currentUser=u;updateUserArea()}
+  function loadUser(){try{var u=JSON.parse(localStorage.getItem(UKEY));if(u)currentUser=u}catch(e){}updateUserArea()}
+  function logout(){localStorage.removeItem(TKEY);localStorage.removeItem(UKEY);currentUser=null;updateUserArea();toast('已退出登录')}
+  function authH(){var t=getToken();return t?{'Authorization':'Bearer '+t}:{}}
+  function colorFor(v){if(v==null)return'var(--soft)';if(v>=85)return'var(--green)';if(v>=70)return'var(--gold)';return'var(--red)'}
+  function barColor(v){if(v==null)return'var(--soft)';if(v>=85)return'var(--green)';if(v>=70)return'var(--gold)';return'var(--red)'}
 
   function updateUserArea(){
-    var area=$('userArea');
+    var a=$('userArea');
     if(currentUser){
-      area.innerHTML='<span class="username">👤 '+esc(currentUser.username)+'</span><button class="logout-btn" id="logoutBtn">退出</button>';
-      $('logoutBtn').addEventListener('click',logout);
+      a.innerHTML='<div class="avatar">'+(currentUser.username?currentUser.username[0].toUpperCase():'?')+'</div><span class="uname">'+esc(currentUser.username||'用户')+'</span><button style="background:var(--card);border:1px solid var(--border);color:var(--soft)" id="logoutBtn">退出</button>';
+      $('logoutBtn').onclick=logout;
     }else{
-      area.innerHTML='<button class="login-btn" id="loginBtn">登录</button>';
-      $('loginBtn').addEventListener('click',function(){showAuthModal('login')});
+      a.innerHTML='<button class="login-btn" id="loginBtn" style="background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;box-shadow:0 4px 15px rgba(59,130,246,.3)">登录 / 注册</button>';
+      $('loginBtn').onclick=function(){showAuth('login')};
     }
   }
 
-  // ── Navigation ──
   function switchPage(name){
     curPage=name;
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
     var el=$('page-'+name);if(el)el.classList.add('active');
-    document.querySelectorAll('nav .tabs button').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-page')===name)});
-    if(name==='rankings')loadRankings();
-    if(name==='programs')loadPrograms();
-    if(name==='forum'&&!forumLoaded)loadForum();
+    document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('active',b.dataset.page===name)});
+    if(name==='rankings'&&!$('rankContent').children.length)loadRankings();
+    if(name==='programs'&&!$('progGrid').children.length)loadPrograms();
+    if(name==='forum'&&!forumLoaded){forumLoaded=true;loadForum()};
   }
 
-  // ── Auth ──
-  function showAuthModal(mode){
+  /* ── Auth ── */
+  function showAuth(mode){
     var isLogin=mode==='login';
-    var html='<h2>'+(isLogin?'🔑 登录':'📝 注册')+'</h2>';
-    if(!isLogin)html+='<div class="form-group"><label>用户名</label><input id="authUsername" maxlength="30" placeholder="3-30字符"></div>';
-    html+='<div class="form-group"><label>邮箱</label><input id="authEmail" type="email" placeholder="your@email.com"></div>';
-    html+='<div class="form-group"><label>密码</label><input id="authPassword" type="password" placeholder="至少6位"></div>';
-    html+='<button style="width:100%;background:var(--blue);color:#fff;padding:10px;font-size:14px" id="authSubmit">'+(isLogin?'登录':'注册')+'</button>';
-    html+='<div class="auth-switch">'+(isLogin?'还没有账号？<a id="switchToRegister">立即注册</a>':'已有账号？<a id="switchToLogin">去登录</a>')+'</div>';
+    var html='<h2>🔑 '+(isLogin?'登录':'注册')+' UniPulse</h2>';
+    if(!isLogin)html+='<div class="form-group"><label>用户名（3-30字）</label><input id="authUser" maxlength="30" placeholder="取个名字..."></div>';
+    html+='<div class="form-group"><label>邮箱</label><input id="authEmail" type="email" placeholder="you@example.com"></div>';
+    html+='<div class="form-group"><label>密码（至少6位）</label><input id="authPass" type="password" placeholder="••••••"></div>';
+    html+='<button style="width:100%;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;padding:12px;border-radius:10px;font-size:15px;font-weight:700;box-shadow:0 4px 15px rgba(59,130,246,.3)" id="authSubmit">'+(isLogin?'登录':'注册')+'</button>';
+    html+='<div class="auth-switch">'+(isLogin?'没有账号？<a id="swReg">立即注册</a>':'已有账号？<a id="swLogin">去登录</a>')+'</div>';
     $('authBody').innerHTML=html;
     $('authModalBg').classList.add('open');
-    $('authSubmit').addEventListener('click',function(){doAuth(mode)});
-    var sw=isLogin?$('switchToRegister'):$('switchToLogin');
-    if(sw)sw.addEventListener('click',function(e){e.preventDefault();showAuthModal(isLogin?'register':'login')});
+    $('authSubmit').onclick=function(){doAuth(mode)};
+    var sw=isLogin?$('swReg'):$('swLogin');
+    if(sw)sw.onclick=function(e){e.preventDefault();showAuth(isLogin?'register':'login')};
   }
 
   function doAuth(mode){
-    var email=($('authEmail')||{}).value||'';
-    var password=($('authPassword')||{}).value||'';
-    var username=($('authUsername')||{}).value||'';
-    if(!email||!password){toast('请填写邮箱和密码');return}
-    if(mode==='register'&&(!username||username.length<3)){toast('用户名至少3个字符');return}
-    if(password.length<6){toast('密码至少6位');return}
-    var body=mode==='login'?{email:email,password:password}:{username:username,email:email,password:password};
-    var url=mode==='login'?API+'/auth/login':API+'/auth/register';
-    fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}).then(function(d){
-      if(d.token){localStorage.setItem(TOKEN_KEY,d.token);saveUser(d.user||{username:username||email.split('@')[0]});$('authModalBg').classList.remove('open');toast('✅ '+(mode==='login'?'登录成功':'注册成功'))}
+    var email=($('authEmail')||{}).value||'',pass=($('authPass')||{}).value||'',user=($('authUser')||{}).value||'';
+    if(!email||!pass){toast('请填写邮箱和密码');return}
+    if(mode==='register'&&(!user||user.length<3)){toast('用户名至少3个字符');return}
+    if(pass.length<6){toast('密码至少6位');return}
+    var body=mode==='login'?{email:email,password:pass}:{username:user,email:email,password:pass};
+    fetch(API+'/auth/'+(mode==='login'?'login':'register'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}).then(function(d){
+      if(d.token){localStorage.setItem(TKEY,d.token);saveUser(d.user||{username:user||email.split('@')[0]});$('authModalBg').classList.remove('open');toast('✅ '+(mode==='login'?'登录成功！':'注册成功！欢迎加入 UniPulse'))}
       else{toast(d.detail||d.message||'操作失败')}
-    }).catch(function(e){toast('网络错误: '+e.message)});
+    }).catch(function(e){toast('网络错误')});
   }
 
-  // ── Discover ──
-  function resetDiscover(){uniPage=1;uniAllLoaded=false;$('uniGrid').innerHTML='';loadUniversities()}
-
+  /* ── Discover ── */
+  function resetDiscover(){uniPage=1;uniAll=false;$('uniGrid').innerHTML='';loadUniversities()}
   function loadUniversities(){
-    if(uniLoading||uniAllLoaded)return;
-    uniLoading=true;$('discoverSpinner').style.display='block';
+    if(uniLoading||uniAll)return;uniLoading=true;$('discoverSpinner').style.display='block';
     var url=API+'/universities?page='+uniPage+'&size=30';
     if(curRegion!=='all')url+='&region='+encodeURIComponent(curRegion);
     if(curSearch)url+='&search='+encodeURIComponent(curSearch);
     fetch(url).then(function(r){return r.json()}).then(function(data){
       var items=data.items||[],total=data.total||0;
       $('resultStat').textContent='共 '+total+' 所高校';
-      if(items.length<30)uniAllLoaded=true;
-      var grid=$('uniGrid');
+      if(items.length<30)uniAll=true;
       items.forEach(function(u){
-        var m=u.metrics||{};
-        var tagsHtml=(u.tags||[]).slice(0,3).map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('');
+        var m=u.metrics||{},tags=(u.tags||[]).slice(0,3);
+        var tagsHtml=tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('');
         var card=document.createElement('div');card.className='card';
-        card.innerHTML='<div class="card-top"><div class="logo-circle" style="background:'+esc(u.logo||'#334155')+'">'+esc(u.initials||'?')+'</div><div class="card-info"><h3>'+esc(u.cn)+'</h3><div class="loc">'+esc(u.loc)+'</div></div><div class="card-score"><div class="num">'+esc(u.score)+'</div><div class="label">/100</div></div></div>'+(tagsHtml?'<div class="tags">'+tagsHtml+'</div>':'')+'<div class="metrics"><span>学术 <b>'+(m.academic!=null?m.academic:'--')+'</b></span><span>校园 <b>'+(m.campus!=null?m.campus:'--')+'</b></span><span>就业 <b>'+(m.career!=null?m.career:'--')+'</b></span></div>';
-        card.addEventListener('click',function(){openDetail(u.id)});
-        grid.appendChild(card);
+        card.innerHTML='<div class="card-top"><div class="logo-circle" style="background:linear-gradient(135deg,'+esc(u.logo||'#3b82f6')+','+esc(u.logo2||'#8b5cf6')+')">'+esc(u.initials||'?')+'</div><div class="card-info"><h3>'+esc(u.cn)+'</h3><div class="loc">'+esc(u.loc)+'</div></div><div class="card-score"><div class="num">'+(u.score||'-')+'</div><div class="label">/100</div></div></div>'+(tagsHtml?'<div class="tags">'+tagsHtml+'</div>':'')+'<div class="metrics"><span>学术 <b>'+(m.academic!=null?m.academic:'-')+'</b></span><span>校园 <b>'+(m.campus!=null?m.campus:'-')+'</b></span><span>就业 <b>'+(m.career!=null?m.career:'-')+'</b></span></div>';
+        card.onclick=function(){openDetail(u.id)};
+        $('uniGrid').appendChild(card);
       });
-      uniPage++;$('loadMoreWrap').style.display=uniAllLoaded?'none':'block';$('discoverSpinner').style.display='none';uniLoading=false;
-    }).catch(function(e){$('discoverSpinner').style.display='none';uniLoading=false;toast('加载失败: '+e.message)});
+      uniPage++;$('loadMoreWrap').style.display=uniAll?'none':'block';$('discoverSpinner').style.display='none';uniLoading=false;
+    }).catch(function(){$('discoverSpinner').style.display='none';uniLoading=false;toast('加载失败')});
   }
 
-  // ── University Detail ──
+  /* ── University Detail ── */
   function openDetail(id){
     fetch(API+'/universities/'+id).then(function(r){return r.json()}).then(function(u){
       var m=u.metrics||{};
       var dims=[{k:'academic',l:'学术水平'},{k:'research',l:'科研产出'},{k:'reputation',l:'行业声誉'},{k:'campus',l:'校园环境'},{k:'support',l:'学生关怀'},{k:'international',l:'国际化'},{k:'value',l:'性价比'},{k:'career',l:'就业前景'}];
-      var mHtml=dims.map(function(d){var v=m[d.k];var pct=v!=null?v:0;var c=v>=85?'var(--green)':v>=70?'var(--gold)':'var(--red)';return '<div class="metric-row"><span class="label">'+d.l+'</span><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+c+'"></div></div><span class="val">'+(v!=null?v:'--')+'</span></div>'}).join('');
-      var tagsHtml=(u.tags||[]).map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('');
-      $('modalBody').innerHTML='<h2>'+esc(u.cn)+'</h2><div style="color:var(--soft);font-size:13px;margin-bottom:12px">'+esc(u.name)+' · '+esc(u.loc)+'</div>'+(u.description?'<p style="margin-bottom:12px;color:var(--soft);font-size:13px;line-height:1.6">'+esc(u.description)+'</p>':'')+(tagsHtml?'<div class="tags" style="margin-bottom:12px">'+tagsHtml+'</div>':'')+'<h3 style="font-size:14px;margin-bottom:10px">📊 多维评分</h3>'+mHtml+'<div style="margin-top:12px;font-size:11px;color:var(--soft)">排名 #'+esc(u.rank)+' · '+'★'.repeat(Math.round(u.stars||0))+' '+esc(u.stars||0)+'/5 · '+esc(u.reviews||0)+' 条评价</div>';
+      var mHtml=dims.map(function(d){var v=m[d.k];var pct=v!=null?v:0;return '<div class="metric-row"><span class="mlabel">'+d.l+'</span><div class="mbar"><div class="mbar-fill" style="width:'+pct+'%;background:'+barColor(v)+'"></div></div><span class="mval">'+(v!=null?v:'-')+'</span></div>'}).join('');
+      var tagsHtml=(u.tags||[]).map(function(t){return '<span class="ptag">'+esc(t)+'</span>'}).join('');
+      $('modalBody').innerHTML='<h2>'+esc(u.cn)+'</h2><div style="color:var(--soft);font-size:13px;margin-bottom:16px">'+esc(u.name)+' · '+esc(u.loc)+'</div>'+(u.description?'<p style="margin-bottom:16px;color:rgba(255,255,255,.7);font-size:13px;line-height:1.7">'+esc(u.description)+'</p>':'')+(tagsHtml?'<div class="post-tags">'+tagsHtml+'</div>':'')+'<h3 style="font-size:15px;font-weight:700;margin-bottom:14px">📊 多维评分</h3>'+mHtml+'<div style="margin-top:16px;font-size:11px;color:var(--soft);display:flex;gap:16px"><span>排名 #'+esc(u.rank)+'</span><span>★'.repeat(Math.round(u.stars||0))+' '+esc(u.stars||0)+'/5</span><span>'+esc(u.reviews||0)+' 条评价</span></div>';
       $('modalBg').classList.add('open');
-    }).catch(function(e){toast('加载失败')});
+    }).catch(function(){toast('加载失败')});
   }
 
-  // ── Rankings ──
-  var rankLoaded=false;
+  /* ── Rankings ── */
   function loadRankings(){
-    if(rankLoaded)return;rankLoaded=true;$('rankSpinner').style.display='block';
+    $('rankSpinner').style.display='block';
     fetch(API+'/universities?size=100&page=1').then(function(r){return r.json()}).then(function(data){
-      var items=data.items||[];$('rankSpinner').style.display='none';
+      $('rankSpinner').style.display='none';
+      var items=data.items||[];
       var html='<table class="rank-table"><thead><tr><th>排名</th><th>大学</th><th>综合分</th><th>趋势</th><th>国家</th></tr></thead><tbody>';
       items.forEach(function(u,i){
-        var ti=u.trend==='up'?'📈':u.trend==='down'?'📉':'➡️';
-        html+='<tr class="rank-row" data-uid="'+u.id+'"><td class="rank-pos">#'+u.rank+'</td><td>'+esc(u.cn)+'<br><span style="font-size:10px;color:var(--soft)">'+esc(u.name)+'</span></td><td style="font-weight:700;color:var(--gold)">'+esc(u.score)+'</td><td>'+ti+' '+esc(u.trendV||'')+'</td><td>'+esc(u.country)+'</td></tr>';
+        var ti=u.trend==='up'?'📈 +'+(u.trendV||''):u.trend==='down'?'📉 '+(u.trendV||''):'➡️ -';
+        html+='<tr class="rank-row" data-uid="'+u.id+'"><td class="rank-pos '+(i<3?'hot':'')+'">#'+(i+1)+'</td><td><strong>'+esc(u.cn)+'</strong><br><span style="font-size:11px;color:var(--soft)">'+esc(u.name)+'</span></td><td style="font-weight:700;color:var(--gold)">'+esc(u.score)+'</td><td>'+ti+'</td><td>'+esc(u.country||'')+'</td></tr>';
       });
-      html+='</tbody></table>';$('rankContent').innerHTML=html;
-      document.querySelectorAll('.rank-row').forEach(function(tr){tr.addEventListener('click',function(){openDetail(parseInt(tr.getAttribute('data-uid')))})});
+      html+='</tbody></table>';
+      $('rankContent').innerHTML=html;
+      document.querySelectorAll('.rank-row').forEach(function(tr){tr.onclick=function(){openDetail(parseInt(tr.dataset.uid))}});
     }).catch(function(){$('rankSpinner').style.display='none';toast('排名加载失败')});
   }
 
-  // ── Programs ──
-  var progLoaded=false;
+  /* ── Programs ── */
   function loadPrograms(){
-    if(progLoaded)return;progLoaded=true;
     fetch(API+'/programs').then(function(r){return r.json()}).then(function(progs){
       var html='';
       progs.forEach(function(p){
-        html+='<div class="prog-card"><h4>'+(p.icon||'')+' '+esc(p.name)+'</h4>';
-        (p.univs||[]).forEach(function(u,i){html+='<div class="prog-item"><span class="prog-rank">#'+(i+1)+'</span><span>'+esc(u.univ||u.name||'')+'</span><span style="color:var(--soft)">'+esc(u.tier||'')+'</span></div>'});
+        html+='<div class="prog-card"><h4>'+(p.icon||'📚')+' '+esc(p.name)+'</h4>';
+        (p.univs||[]).slice(0,6).forEach(function(u,i){html+='<div class="prog-item"><span class="prog-rank">#'+(i+1)+'</span><span>'+esc(u.univ||u.name||'')+'</span><span style="color:var(--soft)">'+esc(u.tier||'')+'</span></div>'});
         html+='</div>';
       });
-      $('progGrid').innerHTML=html||'<p style="color:var(--soft)">暂无专业数据</p>';
-    }).catch(function(){$('progGrid').innerHTML='<p style="color:var(--soft)">加载失败</p>'});
+      $('progGrid').innerHTML=html||'<p class="empty-state">暂无专业数据，敬请期待</p>';
+    }).catch(function(){$('progGrid').innerHTML='<p class="empty-state">加载失败</p>'});
   }
 
-  // ── Forum ──
-  function loadForum(){
-    forumLoaded=true;
-    loadForumCats();
-    loadForumPosts();
-    loadForumHot();
-  }
+  /* ── Forum ── */
+  function loadForum(){loadForumCats();loadForumPosts();loadForumHot()}
 
   function loadForumCats(){
     fetch(API+'/forum/categories').then(function(r){return r.json()}).then(function(cats){
       var html='<button class="active" data-cat="all">全部</button>';
-      cats.slice(1).forEach(function(c){html+='<button data-cat="'+esc(c.key)+'">'+c.label+' ('+c.count+')</button>'});
+      cats.slice(1).forEach(function(c){html+='<button data-cat="'+esc(c.key)+'">'+esc(c.label)+' ('+c.count+')</button>'});
       $('forumCats').innerHTML=html;
-      $('forumCats').querySelectorAll('button').forEach(function(b){
-        b.addEventListener('click',function(){
-          $('forumCats').querySelectorAll('button').forEach(function(x){x.classList.remove('active')});
-          b.classList.add('active');forumCat=b.getAttribute('data-cat');loadForumPosts();
-        });
-      });
+      $('forumCats').querySelectorAll('button').forEach(function(b){b.onclick=function(){$('forumCats').querySelectorAll('button').forEach(function(x){x.classList.remove('active')});b.classList.add('active');forumCat=b.dataset.cat;loadForumPosts()}});
     }).catch(function(){});
   }
 
@@ -431,26 +437,23 @@ main{max-width:1200px;margin:0 auto;padding:16px}
     var url=API+'/forum/posts?limit=50';
     if(forumCat!=='all')url+='&category='+encodeURIComponent(forumCat);
     fetch(url).then(function(r){return r.json()}).then(function(posts){
+      if(!posts.length){$('forumList').innerHTML='<div class="empty-state" style="padding:60px 20px"><div style="font-size:40px;margin-bottom:12px">💬</div><div>还没有帖子，来做第一个发帖的人吧！</div></div>';return}
       var html='';
-      if(!posts.length){html='<p style="color:var(--soft);padding:20px;text-align:center">暂无帖子，来发布第一个话题吧！</p>'}
       posts.forEach(function(p){
-        var catLabel=p.cat||p.category||'';
-        html+='<div class="post-card" data-pid="'+p.id+'"><h4>'+esc(p.title)+'</h4><div class="meta"><span class="cat-tag">'+esc(catLabel)+'</span><span>👤 '+esc(p.author||'匿名')+'</span><span>💬 '+(p.replies||0)+'</span><span>👁 '+(p.views||0)+'</span><span>'+esc(p.time||'')+'</span></div></div>';
+        html+='<div class="post-card" data-pid="'+p.id+'"><h4>'+esc(p.title)+'</h4><div class="meta"><span class="cat-badge">'+esc(p.cat||p.category||'')+'</span><span>👤 '+esc(p.author||'匿名')+'</span><span>💬 '+(p.replies||0)+'</span><span>👁 '+(p.views||0)+'</span></div></div>';
       });
       $('forumList').innerHTML=html;
-      $('forumList').querySelectorAll('.post-card').forEach(function(c){
-        c.addEventListener('click',function(){openPost(parseInt(c.getAttribute('data-pid')))});
-      });
-    }).catch(function(){$('forumList').innerHTML='<p style="color:var(--soft)">加载失败</p>'});
+      $('forumList').querySelectorAll('.post-card').forEach(function(c){c.onclick=function(){openPost(parseInt(c.dataset.pid))}});
+    }).catch(function(){$('forumList').innerHTML='<p class="empty-state">加载失败</p>'});
   }
 
   function loadForumHot(){
     fetch(API+'/forum/hot?limit=8').then(function(r){return r.json()}).then(function(items){
       var html='<div class="sidebar-card"><h4>🔥 热门话题</h4>';
-      (items||[]).forEach(function(h){html+='<div class="hot-item" data-hot-title="'+esc(h.text||'')+'">'+esc(h.text||'')+' <span style="color:var(--soft);font-size:10px">👁'+esc(h.views||0)+'</span></div>'});
+      (items||[]).forEach(function(h){html+='<div class="hot-item" data-title="'+esc(h.text||'')+'">'+esc(h.text||'')+' <span style="color:var(--soft);font-size:10px">👁 '+esc(h.views||0)+'</span></div>'});
       html+='</div>';
-      html+='<div class="sidebar-card"><h4>📋 讨论区分类</h4><div style="font-size:12px;color:var(--soft);line-height:1.8">';
-      FORUM_CATS.forEach(function(c){html+='<span style="display:inline-block;margin:0 4px">· '+c+'</span>'});
+      html+='<div class="sidebar-card"><h4>📋 讨论分类</h4><div style="font-size:12px;color:var(--soft);line-height:2">';
+      FORUM_CATS.forEach(function(c){html+='<span style="display:inline-block;margin-right:6px">· '+c+'</span>'});
       html+='</div></div>';
       $('forumSidebar').innerHTML=html;
     }).catch(function(){});
@@ -458,94 +461,61 @@ main{max-width:1200px;margin:0 auto;padding:16px}
 
   function openPost(id){
     fetch(API+'/forum/posts/'+id).then(function(r){return r.json()}).then(function(p){
-      var commentsHtml='';
-      (p.comments||[]).forEach(function(c){
-        commentsHtml+='<div class="comment-item"><div><span class="c-author">'+esc(c.author||'匿名')+'</span><span class="c-time">'+esc(c.created_at||'')+'</span></div><div class="c-text">'+esc(c.text)+'</div><div class="c-actions"><button data-like-cid="'+c.id+'">👍 '+(c.likes||0)+'</button></div></div>';
-      });
-      var tagsHtml=(p.tags||[]).map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('');
-      var replyHtml=currentUser?'<div class="reply-box"><textarea id="replyText" placeholder="写下你的回复..."></textarea><div class="reply-actions"><button class="submit-btn" id="submitReply">回复</button></div></div>':'<p style="color:var(--soft);font-size:12px;margin-top:12px">📌 <a id="replyLoginLink" style="color:var(--blue);cursor:pointer">登录</a> 后即可回复</p>';
-
-      $('postDetailContent').innerHTML='<div class="post-detail"><h2>'+esc(p.title)+'</h2><div class="post-meta"><span class="cat-tag">'+esc(p.cat||p.category||'')+'</span><span>👤 '+esc(p.author||'匿名')+'</span><span>👁 '+esc(p.views||0)+'</span><span>'+esc(p.time||p.created_at||'')+'</span></div>'+(tagsHtml?'<div class="post-tags">'+tagsHtml+'</div>':'')+'<div class="post-body">'+esc(p.content)+'</div><div class="comment-section"><h3>💬 评论 ('+((p.comments||[]).length)+')</h3>'+commentsHtml+'</div>'+replyHtml+'</div>';
-
-      $('forumListView').style.display='none';
-      $('forumDetailView').style.display='block';
-
-      // Bind like buttons
-      document.querySelectorAll('[data-like-cid]').forEach(function(b){
-        b.addEventListener('click',function(){
-          var cid=b.getAttribute('data-like-cid');
-          fetch(API+'/forum/comments/'+cid+'/like',{method:'POST'}).then(function(r){return r.json()}).then(function(d){
-            b.textContent='👍 '+d.likes;toast('👍 已点赞');
-          }).catch(function(){});
-        });
-      });
-
-      // Bind reply
-      var sr=$('submitReply');
-      if(sr)sr.addEventListener('click',function(){submitReply(id)});
-      var rl=$('replyLoginLink');
-      if(rl)rl.addEventListener('click',function(){showAuthModal('login')});
+      var commentsHtml=(p.comments||[]).map(function(c){
+        return '<div class="comment-item"><div><span class="c-author">'+esc(c.author||'匿名')+'</span><span class="c-time">'+esc(c.created_at||'')+'</span></div><div class="c-text">'+esc(c.text)+'</div><div class="c-actions"><button data-lcid="'+c.id+'">👍 '+(c.likes||0)+'</button></div></div>';
+      }).join('');
+      var tagsHtml=(p.tags||[]).map(function(t){return '<span class="ptag">'+esc(t)+'</span>'}).join('');
+      var replyHtml=currentUser?'<div class="reply-box"><textarea id="replyText" placeholder="写下你的回复..."></textarea><div class="reply-actions"><button class="submit-reply" id="submitReply">回复</button></div></div>':'<p style="color:var(--soft);font-size:12px;margin-top:12px">🔑 <a style="color:var(--blue);cursor:pointer" id="replyLoginLink">登录</a> 后即可回复</p>';
+      $('postDetailContent').innerHTML='<div class="post-detail"><h2>'+esc(p.title)+'</h2><div class="post-meta"><span class="cat-badge">'+esc(p.cat||p.category||'')+'</span><span>👤 '+esc(p.author||'匿名')+'</span><span>👁 '+(p.views||0)+' 次阅读</span><span>'+esc(p.time||p.created_at||'')+'</span></div>'+(tagsHtml?'<div class="post-tags">'+tagsHtml+'</div>':'')+'<div class="post-body">'+esc(p.content)+'</div><div class="comment-section"><h3>💬 评论 ('+((p.comments||[]).length)+')</h3>'+commentsHtml+'</div>'+replyHtml+'</div>';
+      $('forumListView').style.display='none';$('forumDetailView').style.display='block';
+      document.querySelectorAll('[data-lcid]').forEach(function(b){b.onclick=function(){var cid=b.dataset.lcid;fetch(API+'/forum/comments/'+cid+'/like',{method:'POST'}).then(function(r){return r.json()}).then(function(d){b.textContent='👍 '+d.likes;toast('👍 已点赞')}).catch(function(){})}});
+      var sr=$('submitReply');if(sr)sr.onclick=function(){submitReply(id)};
+      var rl=$('replyLoginLink');if(rl)rl.onclick=function(){showAuth('login')};
     }).catch(function(){toast('加载失败')});
   }
 
   function submitReply(postId){
     var text=($('replyText')||{}).value||'';
     if(!text.trim()){toast('请输入回复内容');return}
-    fetch(API+'/forum/posts/'+postId+'/comments',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},authHeaders()),body:JSON.stringify({text:text})}).then(function(r){return r.json()}).then(function(d){
-      if(d.id){toast('✅ 回复成功');openPost(postId)}
-      else{toast(d.detail||'回复失败')}
-    }).catch(function(e){toast('回复失败: '+e.message)});
+    fetch(API+'/forum/posts/'+postId+'/comments',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},authH()),body:JSON.stringify({text:text})}).then(function(r){return r.json()}).then(function(d){if(d.id){toast('✅ 回复成功');openPost(postId)}else{toast(d.detail||'回复失败')}}).catch(function(e){toast('回复失败')});
   }
 
   function showCompose(){
-    if(!currentUser){toast('请先登录');showAuthModal('login');return}
-    var catSel=$('composeCategory');
-    catSel.innerHTML=FORUM_CATS.map(function(c){return '<option value="'+c+'">'+c+'</option>'}).join('');
+    if(!currentUser){toast('请先登录');showAuth('login');return}
+    var sel=$('composeCategory');sel.innerHTML=FORUM_CATS.map(function(c){return '<option value="'+c+'">'+c+'</option>'}).join('');
     $('composeTitle').value='';$('composeContent').value='';$('composeTags').value='';
     $('forumListView').style.display='none';$('forumDetailView').style.display='none';$('forumComposeView').style.display='block';
   }
 
   function submitPost(){
-    var title=($('composeTitle')||{}).value||'';
-    var content=($('composeContent')||{}).value||'';
-    var category=($('composeCategory')||{}).value||FORUM_CATS[0];
-    var tagsStr=($('composeTags')||{}).value||'';
+    var title=($('composeTitle')||{}).value||'',content=($('composeContent')||{}).value||'',cat=($('composeCategory')||{}).value||FORUM_CATS[0],tagsStr=($('composeTags')||{}).value||'';
     var tags=tagsStr?tagsStr.split(/[,，]/).map(function(t){return t.trim()}).filter(Boolean):[];
     if(!title.trim()){toast('请输入标题');return}
     if(!content.trim()){toast('请输入内容');return}
-    fetch(API+'/forum/posts',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},authHeaders()),body:JSON.stringify({title:title,category:category,content:content,tags:tags})}).then(function(r){return r.json()}).then(function(d){
-      if(d.id){toast('✅ 发帖成功');$('forumComposeView').style.display='none';$('forumListView').style.display='block';loadForumPosts();loadForumCats()}
-      else{toast(d.detail||'发帖失败')}
-    }).catch(function(e){toast('发帖失败: '+e.message)});
+    fetch(API+'/forum/posts',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},authH()),body:JSON.stringify({title:title,category:cat,content:content,tags:tags})}).then(function(r){return r.json()}).then(function(d){if(d.id){toast('✅ 发布成功！');$('forumComposeView').style.display='none';$('forumListView').style.display='block';loadForumPosts();loadForumCats()}else{toast(d.detail||'发布失败')}}).catch(function(){toast('发布失败')});
   }
 
-  function backToForumList(){
-    $('forumListView').style.display='block';$('forumDetailView').style.display='none';$('forumComposeView').style.display='none';
-  }
+  function backToList(){$('forumListView').style.display='block';$('forumDetailView').style.display='none';$('forumComposeView').style.display='none';}
 
-  // ── Modal close helpers ──
-  function closeModal(){$('modalBg').classList.remove('open')}
+  /* ── Events ── */
+  document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){switchPage(b.dataset.page)}});
+  $('logoHome').onclick=function(){switchPage('discover')};
+  $('regionFilter').onchange=function(){curRegion=this.value;resetDiscover()};
+  var st=null;$('searchInput').oninput=function(){clearTimeout(st);st=setTimeout(function(){curSearch=$('searchInput').value.trim();resetDiscover()},350)};
+  $('searchBtn').onclick=function(){curSearch=$('searchInput').value.trim();resetDiscover()};
+  $('loadMoreBtn').onclick=loadUniversities;
+  $('modalClose').onclick=function(){$('modalBg').classList.remove('open')};
+  $('modalBg').onclick=function(e){if(e.target===$('modalBg'))$('modalBg').classList.remove('open')};
+  $('authClose').onclick=function(){$('authModalBg').classList.remove('open')};
+  $('authModalBg').onclick=function(e){if(e.target===$('authModalBg'))$('authModalBg').classList.remove('open')};
+  document.onkeydown=function(e){if(e.key==='Escape'){$('modalBg').classList.remove('open');$('authModalBg').classList.remove('open')}};
+  $('newPostBtn').onclick=showCompose;
+  $('backToList').onclick=backToList;
+  $('backFromCompose').onclick=backToList;
+  $('submitPost').onclick=submitPost;
+  $('cancelPost').onclick=backToList;
 
-  // ── Bind Events ──
-  document.querySelectorAll('nav .tabs button').forEach(function(btn){btn.addEventListener('click',function(){switchPage(btn.getAttribute('data-page'))})});
-  $('logoHome').addEventListener('click',function(){switchPage('discover')});
-  $('regionFilter').addEventListener('change',function(){curRegion=this.value;resetDiscover()});
-  var searchTimer=null;
-  $('searchInput').addEventListener('input',function(){clearTimeout(searchTimer);searchTimer=setTimeout(function(){curSearch=$('searchInput').value.trim();resetDiscover()},400)});
-  $('searchBtn').addEventListener('click',function(){curSearch=$('searchInput').value.trim();resetDiscover()});
-  $('loadMoreBtn').addEventListener('click',loadUniversities);
-  $('modalClose').addEventListener('click',closeModal);
-  $('modalBg').addEventListener('click',function(e){if(e.target===$('modalBg'))closeModal()});
-  $('authClose').addEventListener('click',function(){$('authModalBg').classList.remove('open')});
-  $('authModalBg').addEventListener('click',function(e){if(e.target===$('authModalBg'))$('authModalBg').classList.remove('open')});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();$('authModalBg').classList.remove('open')}});
-  $('newPostBtn').addEventListener('click',showCompose);
-  $('backToList').addEventListener('click',backToForumList);
-  $('backFromCompose').addEventListener('click',backToForumList);
-  $('submitPost').addEventListener('click',submitPost);
-  $('cancelPost').addEventListener('click',backToForumList);
-
-  // ── Init ──
+  /* ── Init ── */
   loadUser();
   loadUniversities();
 })();
