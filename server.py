@@ -48,7 +48,7 @@ def get_current_user(
         db.close()
         return None
     user = db.execute(
-        "SELECT id, username, email FROM users WHERE id=?", (row['user_id'],)
+        "SELECT id, username, email, role FROM users WHERE id=?", (row['user_id'],)
     ).fetchone()
     db.close()
     return dict(user) if user else None
@@ -56,6 +56,16 @@ def get_current_user(
 def require_user(user: dict = Depends(get_current_user)) -> dict:
     if not user:
         raise HTTPException(status_code=401, detail="请先登录")
+    return user
+
+def require_admin(user: dict = Depends(get_current_user)) -> dict:
+    if not user:
+        raise HTTPException(status_code=401, detail="请先登录")
+    db = get_db()
+    row = db.execute("SELECT role FROM users WHERE id=?", (user['id'],)).fetchone()
+    db.close()
+    if not row or row['role'] != 'admin':
+        raise HTTPException(status_code=403, detail="需要管理员权限")
     return user
 
 # ── Pydantic Models ─────────────────────────────────────
@@ -95,6 +105,7 @@ def init_db():
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
+            role TEXT DEFAULT 'user',
             created_at TEXT DEFAULT (datetime('now','localtime'))
         );
         CREATE TABLE IF NOT EXISTS sessions (
@@ -134,6 +145,19 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_comments_post ON forum_comments(post_id);
         CREATE INDEX IF NOT EXISTS idx_posts_category ON forum_posts(category);
     """)
+
+    # Ensure role column and admin user exist
+    try:
+        db.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'")
+    except Exception:
+        pass
+    if not db.execute("SELECT 1 FROM users WHERE role='admin'").fetchone():
+        admin_hash = hash_pw('admin123')
+        try:
+            db.execute("INSERT INTO users(username,email,password_hash,role) VALUES('admin','admin@unipulse.com',?,'admin')", (admin_hash,))
+        except Exception:
+            db.execute("UPDATE users SET role='admin' WHERE id=1")
+    db.commit()
 
     if db.execute("SELECT COUNT(*) FROM universities").fetchone()[0] == 0:
         seed_data(db)
@@ -437,6 +461,137 @@ def get_hot_topics(limit: int = Query(5)):
     db.close()
     return result
 
+# ── Admin API ───────────────────────────────────────────
+
+@app.get("/api/admin/stats")
+def admin_stats(_: dict = Depends(require_admin)):
+    db = get_db()
+    users = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    posts = db.execute("SELECT COUNT(*) FROM forum_posts").fetchone()[0]
+    comments = db.execute("SELECT COUNT(*) FROM forum_comments").fetchone()[0]
+    unis = db.execute("SELECT COUNT(*) FROM universities").fetchone()[0]
+    programs_cnt = db.execute("SELECT COUNT(*) FROM programs").fetchone()[0]
+    recent = db.execute("SELECT COUNT(*) FROM users WHERE created_at > datetime('now','localtime','-7 days')").fetchone()[0]
+    recent_posts = db.execute("SELECT COUNT(*) FROM forum_posts WHERE created_at > datetime('now','localtime','-7 days')").fetchone()[0]
+    db.close()
+    return {"users": users, "posts": posts, "comments": comments,
+            "universities": unis, "programs": programs_cnt,
+            "recent_users": recent, "recent_posts": recent_posts}
+
+@app.get("/api/admin/users")
+def admin_list_users(page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100), _: dict = Depends(require_admin)):
+    db = get_db()
+    total = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    rows = db.execute("SELECT id,username,email,role,created_at FROM users ORDER BY id DESC LIMIT ? OFFSET ?",
+                      (size, (page-1)*size)).fetchall()
+    db.close()
+    return {"total": total, "items": [dict(r) for r in rows]}
+
+@app.put("/api/admin/users/{user_id}/role")
+def admin_set_role(user_id: int, role: str = Query(...), _: dict = Depends(require_admin)):
+    if role not in ('user', 'admin'):
+        raise HTTPException(400, "role 必须是 user 或 admin")
+    db = get_db()
+    if not db.execute("SELECT 1 FROM users WHERE id=?", (user_id,)).fetchone():
+        db.close(); raise HTTPException(404, "用户不存在")
+    db.execute("UPDATE users SET role=? WHERE id=?", (role, user_id))
+    db.commit(); db.close()
+    return {"ok": True, "user_id": user_id, "role": role}
+
+@app.delete("/api/admin/users/{user_id}")
+def admin_delete_user(user_id: int, _: dict = Depends(require_admin)):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM users WHERE id=?", (user_id,)).fetchone():
+        db.close(); raise HTTPException(404, "用户不存在")
+    db.execute("DELETE FROM sessions WHERE user_id=?", (user_id,))
+    db.execute("UPDATE forum_posts SET user_id=NULL, author='[已删除用户]' WHERE user_id=?", (user_id,))
+    db.execute("UPDATE forum_comments SET user_id=NULL, author='[已删除用户]' WHERE user_id=?", (user_id,))
+    db.execute("DELETE FROM users WHERE id=?", (user_id,))
+    db.commit(); db.close()
+    return {"ok": True}
+
+@app.get("/api/admin/posts")
+def admin_list_posts(page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100), _: dict = Depends(require_admin)):
+    db = get_db()
+    total = db.execute("SELECT COUNT(*) FROM forum_posts").fetchone()[0]
+    rows = db.execute("SELECT p.*, (SELECT COUNT(*) FROM forum_comments WHERE post_id=p.id) as comment_count FROM forum_posts p ORDER BY p.id DESC LIMIT ? OFFSET ?",
+                      (size, (page-1)*size)).fetchall()
+    db.close()
+    return {"total": total, "items": [dict(r) for r in rows]}
+
+@app.delete("/api/admin/posts/{post_id}")
+def admin_delete_post(post_id: int, _: dict = Depends(require_admin)):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM forum_posts WHERE id=?", (post_id,)).fetchone():
+        db.close(); raise HTTPException(404, "帖子不存在")
+    db.execute("DELETE FROM forum_comments WHERE post_id=?", (post_id,))
+    db.execute("DELETE FROM forum_posts WHERE id=?", (post_id,))
+    db.commit(); db.close()
+    return {"ok": True}
+
+@app.get("/api/admin/comments")
+def admin_list_comments(page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100), _: dict = Depends(require_admin)):
+    db = get_db()
+    total = db.execute("SELECT COUNT(*) FROM forum_comments").fetchone()[0]
+    rows = db.execute("SELECT c.*, p.title as post_title FROM forum_comments c LEFT JOIN forum_posts p ON c.post_id=p.id ORDER BY c.id DESC LIMIT ? OFFSET ?",
+                      (size, (page-1)*size)).fetchall()
+    db.close()
+    return {"total": total, "items": [dict(r) for r in rows]}
+
+@app.delete("/api/admin/comments/{comment_id}")
+def admin_delete_comment(comment_id: int, _: dict = Depends(require_admin)):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM forum_comments WHERE id=?", (comment_id,)).fetchone():
+        db.close(); raise HTTPException(404, "评论不存在")
+    db.execute("DELETE FROM forum_comments WHERE id=?", (comment_id,))
+    db.commit(); db.close()
+    return {"ok": True}
+
+@app.get("/api/admin/universities")
+def admin_list_unis(page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100), _: dict = Depends(require_admin)):
+    db = get_db()
+    total = db.execute("SELECT COUNT(*) FROM universities").fetchone()[0]
+    rows = db.execute("SELECT * FROM universities ORDER BY rank ASC LIMIT ? OFFSET ?",
+                      (size, (page-1)*size)).fetchall()
+    result = []
+    for r in rows:
+        d = dict(r)
+        d['metrics'] = parse_json_field(d['metrics'])
+        d['tags'] = parse_json_field(d['tags'])
+        result.append(d)
+    db.close()
+    return {"total": total, "items": result}
+
+@app.delete("/api/admin/universities/{uni_id}")
+def admin_delete_uni(uni_id: int, _: dict = Depends(require_admin)):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM universities WHERE id=?", (uni_id,)).fetchone():
+        db.close(); raise HTTPException(404, "高校不存在")
+    db.execute("DELETE FROM universities WHERE id=?", (uni_id,))
+    db.commit(); db.close()
+    return {"ok": True}
+
+@app.put("/api/admin/universities/{uni_id}")
+def admin_update_uni(uni_id: int, data: dict = None, _: dict = Depends(require_admin)):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM universities WHERE id=?", (uni_id,)).fetchone():
+        db.close(); raise HTTPException(404, "高校不存在")
+    allowed = ['name','cn','loc','region','country','logo','initials','score','trend','trendV','stars','reviews','rank','description']
+    sets = []; vals = []
+    for k in allowed:
+        if k in (data or {}):
+            sets.append(k+'=?'); vals.append(data[k])
+    if data and 'metrics' in data:
+        sets.append('metrics=?'); vals.append(json.dumps(data['metrics'], ensure_ascii=False))
+    if data and 'tags' in data:
+        sets.append('tags=?'); vals.append(json.dumps(data['tags'], ensure_ascii=False))
+    if not sets:
+        db.close(); return {"ok": True}
+    vals.append(uni_id)
+    db.execute('UPDATE universities SET '+','.join(sets)+' WHERE id=?', vals)
+    db.commit(); db.close()
+    return {"ok": True}
+
 # ── Health ──────────────────────────────────────────────
 
 @app.get("/api/health")
@@ -582,6 +737,13 @@ async def wait_ai_report(report_id: str, timeout: int = Query(30)):
 
 
 # ── Static files (frontend) ─────────────────────────────
+
+@app.get("/admin")
+async def admin_page():
+    p = DIST / "admin.html"
+    if p.exists():
+        return FileResponse(str(p))
+    raise HTTPException(404, "admin.html not found")
 
 if DIST.exists():
     @app.get("/{full_path:path}")
