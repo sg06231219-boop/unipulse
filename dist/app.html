@@ -57,7 +57,6 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 .comment-box .text{font-size:.85rem;margin-top:3px}
 .reply-form{margin-top:16px;display:flex;gap:8px}
 .reply-form textarea{flex:1;resize:vertical;min-height:50px}
-.reply-form button{background:var(--accent);color:#fff;align-self:flex-end}
 .metrics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:16px 0}
 @media(max-width:768px){nav{padding:0 10px}nav .nav-links a{padding:5px 8px;font-size:.75rem}main{padding:12px}.card-grid{grid-template-columns:1fr}.uni-rec{flex-direction:column;text-align:center}}
 </style>
@@ -66,36 +65,42 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 <nav>
   <div class="logo">UniPulse</div>
   <div class="nav-links">
-    <a onclick="showPage('discover')" id="nav-discover" class="active">发现</a>
-    <a onclick="showPage('rankings')" id="nav-rankings">排名</a>
-    <a onclick="showPage('forum')" id="nav-forum">论坛</a>
-    <a onclick="showPage('report')" id="nav-report">AI选校</a>
+    <a id="nav-discover" class="active">发现</a>
+    <a id="nav-rankings">排名</a>
+    <a id="nav-forum">论坛</a>
+    <a id="nav-report">AI选校</a>
   </div>
-  <div class="user-area" id="user-area"><button onclick="showAuth()" id="login-btn">登录</button></div>
+  <div class="user-area" id="user-area"><button id="login-btn">登录</button></div>
 </nav>
 
 <main>
+  <!-- Discover -->
   <div class="page active" id="page-discover">
     <h2>探索全球高校</h2>
     <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-      <input type="text" id="search-input" placeholder="搜索大学..." style="max-width:360px" oninput="filterUniversities()">
-      <select id="region-filter" style="max-width:180px" onchange="filterUniversities()"><option value="">全部国家</option></select>
+      <input type="text" id="search-input" placeholder="搜索大学..." style="max-width:360px">
+      <select id="region-filter" style="max-width:180px"><option value="">全部国家</option></select>
     </div>
     <div class="card-grid" id="uni-grid"></div>
   </div>
 
+  <!-- Rankings -->
   <div class="page" id="page-rankings">
     <h2>综合排名</h2>
     <p style="color:var(--muted);font-size:.85rem;margin-top:4px">覆盖63个国家，基于八维评分</p>
     <div id="ranking-list" style="margin-top:16px"></div>
   </div>
 
-  <div class="page" id="page-detail"><div id="detail-content" style="max-width:780px;margin:0 auto"></div></div>
+  <!-- Detail -->
+  <div class="page" id="page-detail">
+    <div id="detail-content" style="max-width:780px;margin:0 auto"></div>
+  </div>
 
+  <!-- Forum -->
   <div class="page" id="page-forum">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h2>校园论坛</h2>
-      <button onclick="showNewPost()" style="background:var(--accent);color:#fff" id="new-post-btn">✏️ 发帖</button>
+      <button id="new-post-btn" style="background:var(--accent);color:#fff">✏️ 发帖</button>
     </div>
     <div id="forum-list" style="margin-top:16px"></div>
     <div id="new-post-form" style="display:none;max-width:560px;margin:16px auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px">
@@ -103,15 +108,19 @@ main{max-width:1100px;margin:0 auto;padding:20px}
       <div class="form-group"><label>标题</label><input id="post-title" placeholder="帖子标题"></div>
       <div class="form-group"><label>内容</label><textarea id="post-content" rows="4" placeholder="分享你的看法..."></textarea></div>
       <div style="display:flex;gap:8px">
-        <button onclick="submitPost()" style="background:var(--accent);color:#fff">发布</button>
-        <button onclick="hideNewPost()" style="background:#f3f4f6;color:#374151">取消</button>
+        <button id="submit-post-btn" style="background:var(--accent);color:#fff">发布</button>
+        <button id="cancel-post-btn" style="background:#f3f4f6;color:#374151">取消</button>
       </div>
       <div id="post-error" class="error" style="display:none"></div>
     </div>
   </div>
 
-  <div class="page" id="page-forum-detail"><div id="forum-detail-content" style="max-width:780px;margin:0 auto"></div></div>
+  <!-- Forum Post Detail -->
+  <div class="page" id="page-forum-detail">
+    <div id="forum-detail-content" style="max-width:780px;margin:0 auto"></div>
+  </div>
 
+  <!-- AI Report -->
   <div class="page" id="page-report">
     <div id="report-form-container">
       <div style="max-width:560px;margin:0 auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px">
@@ -124,7 +133,7 @@ main{max-width:1100px;margin:0 auto;padding:20px}
           <select id="r-budget"><option value="不限">不限</option><option value="0-20万">0-20万/年</option><option value="20-50万">20-50万/年</option><option value="50万以上">50万以上/年</option></select>
         </div>
         <div class="form-group"><label>语言成绩</label><input type="text" id="r-language" placeholder="如：托福100、雅思7"></div>
-        <button class="submit-btn" onclick="generateReport()" id="report-btn">🚀 生成选校报告</button>
+        <button class="submit-btn" id="report-btn">🚀 生成选校报告</button>
         <div style="text-align:center;margin-top:8px;color:var(--muted);font-size:.8rem">免费 · 即时生成</div>
       </div>
     </div>
@@ -132,14 +141,15 @@ main{max-width:1100px;margin:0 auto;padding:20px}
   </div>
 </main>
 
+<!-- Auth Modal -->
 <div class="auth-overlay" id="auth-overlay" style="display:none">
   <div class="auth-box">
     <div id="auth-login">
       <h2>登录 UniPulse</h2>
       <div class="form-group"><label>邮箱</label><input type="email" id="login-email"></div>
       <div class="form-group"><label>密码</label><input type="password" id="login-password"></div>
-      <button onclick="doLogin()" style="width:100%;background:var(--navy);color:var(--gold);padding:10px">登录</button>
-      <p style="text-align:center;margin-top:10px;font-size:.85rem">没有账号？<span class="switch-link" onclick="toggleAuth()">注册</span></p>
+      <button id="do-login-btn" style="width:100%;background:var(--navy);color:var(--gold);padding:10px">登录</button>
+      <p style="text-align:center;margin-top:10px;font-size:.85rem">没有账号？<span class="switch-link" id="to-register-link">注册</span></p>
       <div id="login-error" class="error" style="display:none"></div>
     </div>
     <div id="auth-register" style="display:none">
@@ -147,213 +157,454 @@ main{max-width:1100px;margin:0 auto;padding:20px}
       <div class="form-group"><label>用户名</label><input id="reg-username"></div>
       <div class="form-group"><label>邮箱</label><input type="email" id="reg-email"></div>
       <div class="form-group"><label>密码</label><input type="password" id="reg-password"></div>
-      <button onclick="doRegister()" style="width:100%;background:var(--navy);color:var(--gold);padding:10px">注册</button>
-      <p style="text-align:center;margin-top:10px;font-size:.85rem">已有账号？<span class="switch-link" onclick="toggleAuth()">登录</span></p>
+      <button id="do-register-btn" style="width:100%;background:var(--navy);color:var(--gold);padding:10px">注册</button>
+      <p style="text-align:center;margin-top:10px;font-size:.85rem">已有账号？<span class="switch-link" id="to-login-link">登录</span></p>
       <div id="reg-error" class="error" style="display:none"></div>
     </div>
-    <button onclick="hideAuth()" style="position:absolute;top:10px;right:14px;background:none;color:var(--muted);font-size:1.2rem">✕</button>
+    <button id="close-auth-btn" style="position:absolute;top:10px;right:14px;background:none;color:var(--muted);font-size:1.2rem">✕</button>
   </div>
 </div>
 
 <script>
-const API='';
-let token=localStorage.getItem('unipulse_token');
-let currentUser=JSON.parse(localStorage.getItem('unipulse_user')||'null');
-let universities=[],forumPosts=[];
-let _gridAll=[],_gridPage=0;
-const PAGE=30;
+(function(){
+  "use strict";
+  var API = '';
+  var token = localStorage.getItem('unipulse_token');
+  var currentUser = null;
+  try { currentUser = JSON.parse(localStorage.getItem('unipulse_user') || 'null'); } catch(e) {}
+  var universities = [];
+  var forumPosts = [];
+  var _gridAll = [], _gridPage = 0, _rankAll = [], _rankPage = 0;
+  var PAGE = 30;
 
-async function api(m,p,body){
-  const h={'Content-Type':'application/json'};
-  if(token)h['Authorization']='Bearer '+token;
-  const o={method:m,headers:h};
-  if(body)o.body=JSON.stringify(body);
-  const r=await fetch(API+p,o);
-  const d=await r.json();
-  if(!r.ok)throw new Error(d.detail||r.statusText);
-  return d;
-}
+  // ── Helpers ──
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// Auth
-function showAuth(){document.getElementById('auth-overlay').style.display='flex'}
-function hideAuth(){document.getElementById('auth-overlay').style.display='none'}
-function toggleAuth(){
-  const l=document.getElementById('auth-login'),r=document.getElementById('auth-register');
-  l.style.display=l.style.display==='none'?'block':'none';
-  r.style.display=r.style.display==='none'?'block':'none';
-}
-async function doLogin(){
-  try{const d=await api('POST','/api/auth/login',{email:document.getElementById('login-email').value,password:document.getElementById('login-password').value});
-  token=d.token;currentUser=d.user;localStorage.setItem('unipulse_token',token);localStorage.setItem('unipulse_user',JSON.stringify(currentUser));hideAuth();updateUserUI();}
-  catch(e){showErr('login-error',e.message)}
-}
-async function doRegister(){
-  try{const d=await api('POST','/api/auth/register',{username:document.getElementById('reg-username').value,email:document.getElementById('reg-email').value,password:document.getElementById('reg-password').value});
-  token=d.token;currentUser=d.user;localStorage.setItem('unipulse_token',token);localStorage.setItem('unipulse_user',JSON.stringify(currentUser));hideAuth();updateUserUI();}
-  catch(e){showErr('reg-error',e.message)}
-}
-function doLogout(){token=null;currentUser=null;localStorage.removeItem('unipulse_token');localStorage.removeItem('unipulse_user');updateUserUI()}
-function updateUserUI(){
-  const a=document.getElementById('user-area');
-  a.innerHTML=currentUser?`<span class="username">👋 ${currentUser.username}</span><button onclick="doLogout()" style="background:rgba(255,255,255,.1);color:#fff;font-size:.8rem;padding:5px 12px">退出</button>`:`<button onclick="showAuth()" style="background:rgba(255,255,255,.1);color:#fff;font-size:.8rem;padding:5px 12px">登录</button>`;
-}
-function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';setTimeout(()=>e.style.display='none',4000)}
+  async function api(method, path, body) {
+    var h = {'Content-Type': 'application/json'};
+    if (token) h['Authorization'] = 'Bearer ' + token;
+    var opt = {method: method, headers: h};
+    if (body) opt.body = JSON.stringify(body);
+    var r = await fetch(API + path, opt);
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.detail || r.statusText);
+    return d;
+  }
 
-// Nav
-function showPage(name){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
-  const pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
-  const nv=document.getElementById('nav-'+name);if(nv)nv.classList.add('active');
-  if(name==='forum')loadForum();
-  if(name==='rankings')renderRankings();
-}
+  function showErr(id, msg) {
+    var e = $(id);
+    if (!e) return;
+    e.textContent = msg; e.style.display = 'block';
+    setTimeout(function(){ e.style.display = 'none'; }, 4000);
+  }
 
-// Universities
-async function loadUniversities(){
-  try{
-    const data=await api('GET','/api/universities');
-    universities=data;
-    const sel=document.getElementById('region-filter');
-    [...new Set(data.map(u=>u.country))].sort().forEach(c=>{
-      const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
+  // ── Auth ──
+  function showAuth() { $('auth-overlay').style.display = 'flex'; }
+  function hideAuth() { $('auth-overlay').style.display = 'none'; }
+  function toggleAuth() {
+    var l = $('auth-login'), r = $('auth-register');
+    l.style.display = l.style.display === 'none' ? 'block' : 'none';
+    r.style.display = r.style.display === 'none' ? 'block' : 'none';
+  }
+
+  async function doLogin() {
+    try {
+      var d = await api('POST', '/api/auth/login', {
+        email: $('login-email').value,
+        password: $('login-password').value
+      });
+      token = d.token; currentUser = d.user;
+      localStorage.setItem('unipulse_token', token);
+      localStorage.setItem('unipulse_user', JSON.stringify(currentUser));
+      hideAuth(); updateUserUI();
+    } catch(e) { showErr('login-error', e.message); }
+  }
+
+  async function doRegister() {
+    try {
+      var d = await api('POST', '/api/auth/register', {
+        username: $('reg-username').value,
+        email: $('reg-email').value,
+        password: $('reg-password').value
+      });
+      token = d.token; currentUser = d.user;
+      localStorage.setItem('unipulse_token', token);
+      localStorage.setItem('unipulse_user', JSON.stringify(currentUser));
+      hideAuth(); updateUserUI();
+    } catch(e) { showErr('reg-error', e.message); }
+  }
+
+  function doLogout() {
+    token = null; currentUser = null;
+    localStorage.removeItem('unipulse_token');
+    localStorage.removeItem('unipulse_user');
+    updateUserUI();
+  }
+
+  function updateUserUI() {
+    var a = $('user-area');
+    if (currentUser) {
+      a.innerHTML = '<span class="username">\uD83D\uDC4B ' + esc(currentUser.username) + '</span><button id="logout-btn" style="background:rgba(255,255,255,.1);color:#fff;font-size:.8rem;padding:5px 12px">退出</button>';
+      $('logout-btn').addEventListener('click', doLogout);
+    } else {
+      a.innerHTML = '<button id="login-btn2" style="background:rgba(255,255,255,.1);color:#fff;font-size:.8rem;padding:5px 12px">登录</button>';
+      $('login-btn2').addEventListener('click', showAuth);
+    }
+  }
+
+  // ── Navigation ──
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.nav-links a').forEach(function(a) { a.classList.remove('active'); });
+    var pg = $('page-' + name);
+    if (pg) pg.classList.add('active');
+    var nv = $('nav-' + name);
+    if (nv) nv.classList.add('active');
+    if (name === 'forum') loadForum();
+    if (name === 'rankings') renderRankings();
+  }
+
+  // ── Universities ──
+  async function loadUniversities() {
+    try {
+      var data = await api('GET', '/api/universities');
+      universities = data;
+      // Fill country dropdown
+      var sel = $('region-filter');
+      var countries = [];
+      data.forEach(function(u) {
+        if (u.country && countries.indexOf(u.country) === -1) countries.push(u.country);
+      });
+      countries.sort();
+      countries.forEach(function(c) {
+        var o = document.createElement('option');
+        o.value = c; o.textContent = c; sel.appendChild(o);
+      });
+      filterUniversities();
+    } catch(e) { console.error('loadUniversities failed:', e); }
+  }
+
+  function filterUniversities() {
+    var q = $('search-input').value.toLowerCase();
+    var rg = $('region-filter').value;
+    var f = universities;
+    if (q) f = f.filter(function(u) {
+      return (u.cn || u.name).toLowerCase().indexOf(q) >= 0 || (u.country || '').toLowerCase().indexOf(q) >= 0;
     });
-    filterUniversities();
-  }catch(e){console.error('加载失败:',e)}
-}
-
-function filterUniversities(){
-  const q=document.getElementById('search-input').value.toLowerCase();
-  const rg=document.getElementById('region-filter').value;
-  let f=universities;
-  if(q)f=f.filter(u=>(u.cn||u.name).toLowerCase().includes(q)||(u.country||'').toLowerCase().includes(q));
-  if(rg)f=f.filter(u=>(u.country||'').includes(rg)||(u.region||'').includes(rg));
-  renderGrid(f);
-}
-
-function renderGrid(list){
-  const grid=document.getElementById('uni-grid');
-  _gridAll=list;_gridPage=0;
-  grid.innerHTML='';
-  appendGrid();
-}
-
-function appendGrid(){
-  const grid=document.getElementById('uni-grid');
-  const start=_gridPage*PAGE,end=start+PAGE;
-  const slice=_gridAll.slice(start,end);
-  _gridPage++;
-  const frag=document.createDocumentFragment();
-  slice.forEach(u=>{
-    const avg=u.metrics?Object.values(u.metrics).reduce((a,b)=>a+b,0)/Object.values(u.metrics).length:0;
-    const d=document.createElement('div');d.className='card';
-    d.innerHTML=`<h3>${u.cn||u.name}</h3><div>${(u.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join('')}</div><div class="meta">${u.country||''} · QS #${u.rank||'—'}</div><div class="score-bar"><div class="fill" style="width:${avg}%"></div></div>`;
-    d.addEventListener('click',()=>showDetail(u.id));
-    frag.appendChild(d);
-  });
-  grid.appendChild(frag);
-  let more=document.getElementById('load-more');if(more)more.remove();
-  if(_gridPage*PAGE<_gridAll.length){
-    const b=document.createElement('button');b.id='load-more';b.className='load-more';
-    b.textContent='加载更多 ('+(_gridAll.length-_gridPage*PAGE)+' 所)';
-    b.addEventListener('click',appendGrid);
-    grid.parentElement.appendChild(b);
+    if (rg) f = f.filter(function(u) {
+      return (u.country || '') === rg || (u.region || '') === rg;
+    });
+    renderGrid(f);
   }
-}
 
-// Rankings - also paginated
-let _rankPage=0,_rankAll=[];
-function renderRankings(){
-  _rankAll=[...universities].sort((a,b)=>(a.rank||999)-(b.rank||999));
-  _rankPage=0;
-  document.getElementById('ranking-list').innerHTML='';
-  appendRank();
-}
-function appendRank(){
-  const el=document.getElementById('ranking-list');
-  const start=_rankPage*PAGE,end=start+PAGE;
-  const slice=_rankAll.slice(start,end);_rankPage++;
-  const frag=document.createDocumentFragment();
-  slice.forEach((u,i)=>{
-    const idx=start+i;
-    const avg=u.metrics?Object.values(u.metrics).reduce((a,b)=>a+b,0)/Object.values(u.metrics).length:0;
-    const medal=idx<3?['🥇','🥈','🥉'][idx]:''+(idx+1);
-    const d=document.createElement('div');d.className='post-item';
-    d.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:1.1rem;margin-right:10px">${medal}</span><strong>${u.cn||u.name}</strong><span style="color:var(--muted);font-size:.8rem;margin-left:6px">${u.country||''}</span></div><div style="text-align:right"><div style="font-weight:700;color:var(--navy)">${avg.toFixed(1)}</div><div style="font-size:.75rem;color:var(--muted)">QS #${u.rank||'—'}</div></div></div>`;
-    d.addEventListener('click',()=>showDetail(u.id));
-    frag.appendChild(d);
-  });
-  el.appendChild(frag);
-  let more=document.getElementById('rank-more');if(more)more.remove();
-  if(_rankPage*PAGE<_rankAll.length){
-    const b=document.createElement('button');b.id='rank-more';b.className='load-more';
-    b.textContent='加载更多排名 ('+(_rankAll.length-_rankPage*PAGE)+' 所)';
-    b.addEventListener('click',appendRank);
-    el.parentElement.appendChild(b);
+  function renderGrid(list) {
+    var grid = $('uni-grid');
+    _gridAll = list; _gridPage = 0;
+    grid.innerHTML = '';
+    appendGrid();
   }
-}
 
-// Detail
-async function showDetail(id){
-  try{
-    const u=await api('GET','/api/universities/'+id);
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById('page-detail').classList.add('active');
-    const dims=['学术声誉','雇主声誉','师生比','国际化','论文引用','研究成果','教学水平','就业率'];
-    const keys=['academic','employer','ratio','international','citations','research','teaching','employment'];
-    document.getElementById('detail-content').innerHTML=`<button class="back-btn" onclick="showPage('discover')">← 返回</button><h1>${u.cn||u.name}</h1><div style="color:var(--muted);font-size:.95rem;margin-bottom:20px">${u.name} · ${u.country||''} · QS #${u.rank||'—'}</div><p style="margin-bottom:20px">${u.description||''}</p>${(u.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join('')}<h3 style="margin-top:20px;margin-bottom:10px">八维评分</h3><div class="metrics-grid">${keys.map((k,i)=>'<div class="metric-card"><div class="label">'+dims[i]+'</div><div class="value">'+(u.metrics&&u.metrics[k]!=null?u.metrics[k]:'—')+'</div></div>').join('')}</div>`;
-  }catch(e){alert('加载失败: '+e.message)}
-}
+  function appendGrid() {
+    var grid = $('uni-grid');
+    var start = _gridPage * PAGE, end = start + PAGE;
+    var slice = _gridAll.slice(start, end);
+    _gridPage++;
+    var frag = document.createDocumentFragment();
+    slice.forEach(function(u) {
+      var vals = u.metrics ? Object.values(u.metrics) : [];
+      var avg = vals.length ? vals.reduce(function(a,b){return a+b;},0) / vals.length : 0;
+      var d = document.createElement('div');
+      d.className = 'card';
+      var tagsHtml = '';
+      if (u.tags && u.tags.length) {
+        u.tags.forEach(function(t) { tagsHtml += '<span class="tag">' + esc(t) + '</span>'; });
+      }
+      d.innerHTML = '<h3>' + esc(u.cn || u.name) + '</h3>' +
+        '<div>' + tagsHtml + '</div>' +
+        '<div class="meta">' + esc(u.country || '') + ' · QS #' + (u.rank || '—') + '</div>' +
+        '<div class="score-bar"><div class="fill" style="width:' + avg.toFixed(0) + '%"></div></div>';
+      (function(uid) {
+        d.addEventListener('click', function() { showDetail(uid); });
+      })(u.id);
+      frag.appendChild(d);
+    });
+    grid.appendChild(frag);
 
-// Forum
-async function loadForum(){
-  try{forumPosts=await api('GET','/api/forum/posts');
-  document.getElementById('forum-list').innerHTML=forumPosts.map(p=>`<div class="post-item" onclick="showForumPost(${p.id})"><h3>${p.title}</h3><div class="post-meta"><span>✍️ ${p.author||'匿名'}</span><span>💬 ${p.comments_count||p.comment_count||0}</span></div></div>`).join('');}
-  catch(e){console.error('论坛加载失败:',e)}
-}
-async function showForumPost(id){
-  try{const p=await api('GET','/api/forum/posts/'+id);
-  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
-  document.getElementById('page-forum-detail').classList.add('active');
-  document.getElementById('forum-detail-content').innerHTML=`<button class="back-btn" onclick="showPage('forum')">← 返回论坛</button><h1>${p.title}</h1><div style="color:var(--muted);font-size:.85rem;margin-bottom:16px">✍️ ${p.author||'匿名'} · 👀 ${p.views||0}</div><p style="white-space:pre-line">${p.content||''}</p><h3 style="margin-top:20px">评论 (${(p.comments||[]).length})</h3>${(p.comments||[]).map(c=>`<div class="comment-box"><div class="author">${c.author||'匿名'}</div><div class="text">${c.content||c.text||''}</div></div>`).join('')}<div class="reply-form"><textarea id="reply-content" placeholder="${currentUser?'写下评论...':'请先登录'}" ${currentUser?'':'disabled'}></textarea><button onclick="submitComment(${p.id})" ${currentUser?'':'disabled'} style="background:var(--accent);color:#fff">发送</button></div>`;}
-  catch(e){alert('加载失败: '+e.message)}
-}
-function showNewPost(){if(!currentUser){showAuth();return}document.getElementById('new-post-form').style.display='block'}
-function hideNewPost(){document.getElementById('new-post-form').style.display='none'}
-async function submitPost(){
-  try{await api('POST','/api/forum/posts',{title:document.getElementById('post-title').value,content:document.getElementById('post-content').value,category:'校园生活'});hideNewPost();loadForum();}
-  catch(e){showErr('post-error',e.message)}
-}
-async function submitComment(pid){
-  const c=document.getElementById('reply-content').value;if(!c.trim())return;
-  try{await api('POST','/api/forum/posts/'+pid+'/comments',{content:c});showForumPost(pid);}
-  catch(e){alert('评论失败: '+e.message)}
-}
+    var more = $('load-more');
+    if (more) more.remove();
+    if (_gridPage * PAGE < _gridAll.length) {
+      var b = document.createElement('button');
+      b.id = 'load-more'; b.className = 'load-more';
+      b.textContent = '加载更多 (' + (_gridAll.length - _gridPage * PAGE) + ' 所)';
+      b.addEventListener('click', appendGrid);
+      grid.parentElement.appendChild(b);
+    }
+  }
 
-// AI Report
-async function generateReport(){
-  const major=document.getElementById('r-major').value;
-  if(!major.trim()){alert('请填写意向专业');return}
-  const btn=document.getElementById('report-btn');btn.disabled=true;btn.textContent='⏳ 生成中...';
-  const params=new URLSearchParams({gpa:document.getElementById('r-gpa').value,major,regions:document.getElementById('r-regions').value||'不限',budget:document.getElementById('r-budget').value,language:document.getElementById('r-language').value||'待定'});
-  try{
-    const resp=await api('POST','/api/ai/report?'+params);
-    let result=null;
-    for(let i=0;i<30;i++){await new Promise(r=>setTimeout(r,1000));const d=await api('GET','/api/ai/report/'+resp.report_id);if(d.status==='done'){result=d.result;break}}
-    if(!result){alert('生成超时');return}
-    renderReport(result);
-  }catch(e){alert('生成失败: '+e.message)}
-  finally{btn.disabled=false;btn.textContent='🚀 生成选校报告'}
-}
-function renderReport(r){
-  document.getElementById('report-form-container').style.display='none';
-  const c=document.getElementById('report-result-container');c.style.display='block';
-  c.innerHTML=`<div style="max-width:760px;margin:0 auto"><button class="back-btn" onclick="document.getElementById('report-form-container').style.display='block';c.style.display='none'">← 重新选校</button><h2>🎯 你的选校报告</h2><p style="color:var(--muted);margin-bottom:20px">${r.summary}</p><div style="background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:20px;border-left:4px solid var(--gold)"><div style="font-weight:600;margin-bottom:4px">你的条件</div><div style="font-size:.85rem;color:var(--muted)">GPA:${r.input.gpa} · 专业:${r.input.major} · 地区:${r.input.regions.join(',')||'不限'} · 预算:${r.input.budget}</div></div><h3>🏆 推荐 TOP3</h3>${(r.top_recommendations||[]).map((u,i)=>`<div class="uni-rec" onclick="showDetail(${u.id})"><div class="rank-badge">${i+1}</div><div style="flex:1"><h3>${u.cn} <span style="color:var(--muted);font-weight:400;font-size:.85rem">${u.name}</span></h3><div style="font-size:.85rem;color:var(--success);font-weight:600">匹配度 ${u.score}%</div><div style="font-size:.8rem;color:var(--muted)">${(u.match_reasons||[]).join(' · ')}</div></div><div class="score-ring">${u.score}</div></div>`).join('')}${r.other_options&&r.other_options.length?`<h3 style="margin-top:20px">📋 其他可选</h3>${r.other_options.map(u=>`<div class="post-item" onclick="showDetail(${u.id})"><div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${u.cn}</strong> <span style="color:var(--muted);font-size:.8rem">${u.country||''}</span></div><div style="color:var(--success);font-weight:600">${u.score}%</div></div></div>`).join('')}:''}<div style="margin-top:20px;padding:14px;background:#fef3c7;border-radius:10px;font-size:.8rem;color:#92400e">⚠️ ${r.ai_notice||'本报告基于公开数据分析，仅供参考。'}</div></div>`;
-}
+  // ── Rankings ──
+  function renderRankings() {
+    _rankAll = universities.slice().sort(function(a,b) { return (a.rank||999) - (b.rank||999); });
+    _rankPage = 0;
+    $('ranking-list').innerHTML = '';
+    appendRank();
+  }
 
-// Init
-updateUserUI();
-loadUniversities();
+  function appendRank() {
+    var el = $('ranking-list');
+    var start = _rankPage * PAGE, end = start + PAGE;
+    var slice = _rankAll.slice(start, end);
+    _rankPage++;
+    var frag = document.createDocumentFragment();
+    slice.forEach(function(u, i) {
+      var idx = start + i;
+      var vals = u.metrics ? Object.values(u.metrics) : [];
+      var avg = vals.length ? vals.reduce(function(a,b){return a+b;},0) / vals.length : 0;
+      var medal = idx < 3 ? ['🥇','🥈','🥉'][idx] : '' + (idx + 1);
+      var d = document.createElement('div');
+      d.className = 'post-item';
+      d.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' +
+        '<div><span style="font-size:1.1rem;margin-right:10px">' + medal + '</span>' +
+        '<strong>' + esc(u.cn || u.name) + '</strong>' +
+        '<span style="color:var(--muted);font-size:.8rem;margin-left:6px">' + esc(u.country || '') + '</span></div>' +
+        '<div style="text-align:right"><div style="font-weight:700;color:var(--navy)">' + avg.toFixed(1) + '</div>' +
+        '<div style="font-size:.75rem;color:var(--muted)">QS #' + (u.rank || '—') + '</div></div></div>';
+      (function(uid) {
+        d.addEventListener('click', function() { showDetail(uid); });
+      })(u.id);
+      frag.appendChild(d);
+    });
+    el.appendChild(frag);
+
+    var more = $('rank-more');
+    if (more) more.remove();
+    if (_rankPage * PAGE < _rankAll.length) {
+      var b = document.createElement('button');
+      b.id = 'rank-more'; b.className = 'load-more';
+      b.textContent = '加载更多排名 (' + (_rankAll.length - _rankPage * PAGE) + ' 所)';
+      b.addEventListener('click', appendRank);
+      el.parentElement.appendChild(b);
+    }
+  }
+
+  // ── Detail ──
+  async function showDetail(id) {
+    try {
+      var u = await api('GET', '/api/universities/' + id);
+      document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+      $('page-detail').classList.add('active');
+      var dims = ['学术声誉','雇主声誉','师生比','国际化','论文引用','研究成果','教学水平','就业率'];
+      var keys = ['academic','employer','ratio','international','citations','research','teaching','employment'];
+      var tagsHtml = '';
+      if (u.tags && u.tags.length) {
+        u.tags.forEach(function(t) { tagsHtml += '<span class="tag">' + esc(t) + '</span>'; });
+      }
+      var metricsHtml = '';
+      keys.forEach(function(k, i) {
+        var v = (u.metrics && u.metrics[k] != null) ? u.metrics[k] : '—';
+        metricsHtml += '<div class="metric-card"><div class="label">' + dims[i] + '</div><div class="value">' + v + '</div></div>';
+      });
+      $('detail-content').innerHTML =
+        '<button class="back-btn" id="detail-back-btn">← 返回</button>' +
+        '<h1>' + esc(u.cn || u.name) + '</h1>' +
+        '<div style="color:var(--muted);font-size:.95rem;margin-bottom:20px">' + esc(u.name) + ' · ' + esc(u.country || '') + ' · QS #' + (u.rank || '—') + '</div>' +
+        '<p style="margin-bottom:20px">' + esc(u.description || '') + '</p>' +
+        tagsHtml +
+        '<h3 style="margin-top:20px;margin-bottom:10px">八维评分</h3>' +
+        '<div class="metrics-grid">' + metricsHtml + '</div>';
+      $('detail-back-btn').addEventListener('click', function() { showPage('discover'); });
+    } catch(e) { alert('加载失败: ' + e.message); }
+  }
+
+  // ── Forum ──
+  async function loadForum() {
+    try {
+      forumPosts = await api('GET', '/api/forum/posts');
+      var html = '';
+      forumPosts.forEach(function(p) {
+        html += '<div class="post-item" data-post-id="' + p.id + '">' +
+          '<h3>' + esc(p.title) + '</h3>' +
+          '<div class="post-meta"><span>✍️ ' + esc(p.author || '匿名') + '</span>' +
+          '<span>💬 ' + (p.comments_count || p.comment_count || 0) + '</span></div></div>';
+      });
+      $('forum-list').innerHTML = html;
+      // Bind click events
+      $('forum-list').querySelectorAll('.post-item').forEach(function(el) {
+        el.addEventListener('click', function() {
+          var pid = parseInt(el.getAttribute('data-post-id'));
+          showForumPost(pid);
+        });
+      });
+    } catch(e) { console.error('loadForum failed:', e); }
+  }
+
+  async function showForumPost(id) {
+    try {
+      var p = await api('GET', '/api/forum/posts/' + id);
+      document.querySelectorAll('.page').forEach(function(pg) { pg.classList.remove('active'); });
+      $('page-forum-detail').classList.add('active');
+      var commentsHtml = '';
+      if (p.comments && p.comments.length) {
+        p.comments.forEach(function(c) {
+          commentsHtml += '<div class="comment-box"><div class="author">' + esc(c.author || '匿名') + '</div>' +
+            '<div class="text">' + esc(c.content || c.text || '') + '</div></div>';
+        });
+      }
+      $('forum-detail-content').innerHTML =
+        '<button class="back-btn" id="forum-back-btn">← 返回论坛</button>' +
+        '<h1>' + esc(p.title) + '</h1>' +
+        '<div style="color:var(--muted);font-size:.85rem;margin-bottom:16px">✍️ ' + esc(p.author || '匿名') + ' · 👀 ' + (p.views || 0) + '</div>' +
+        '<p style="white-space:pre-line">' + esc(p.content || '') + '</p>' +
+        '<h3 style="margin-top:20px">评论 (' + (p.comments ? p.comments.length : 0) + ')</h3>' +
+        commentsHtml +
+        '<div class="reply-form">' +
+        '<textarea id="reply-content" placeholder="' + (currentUser ? '写下评论...' : '请先登录') + '" ' + (currentUser ? '' : 'disabled') + '></textarea>' +
+        '<button id="submit-reply-btn" ' + (currentUser ? '' : 'disabled') + ' style="background:var(--accent);color:#fff">发送</button></div>';
+      $('forum-back-btn').addEventListener('click', function() { showPage('forum'); });
+      $('submit-reply-btn').addEventListener('click', function() { submitComment(id); });
+    } catch(e) { alert('加载失败: ' + e.message); }
+  }
+
+  function showNewPost() {
+    if (!currentUser) { showAuth(); return; }
+    $('new-post-form').style.display = 'block';
+  }
+  function hideNewPost() { $('new-post-form').style.display = 'none'; }
+
+  async function submitPost() {
+    try {
+      await api('POST', '/api/forum/posts', {
+        title: $('post-title').value,
+        content: $('post-content').value,
+        category: '校园生活'
+      });
+      hideNewPost(); loadForum();
+    } catch(e) { showErr('post-error', e.message); }
+  }
+
+  async function submitComment(postId) {
+    var c = $('reply-content').value;
+    if (!c.trim()) return;
+    try {
+      await api('POST', '/api/forum/posts/' + postId + '/comments', {content: c});
+      showForumPost(postId);
+    } catch(e) { alert('评论失败: ' + e.message); }
+  }
+
+  // ── AI Report ──
+  async function generateReport() {
+    var major = $('r-major').value;
+    if (!major.trim()) { alert('请填写意向专业'); return; }
+    var btn = $('report-btn');
+    btn.disabled = true; btn.textContent = '⏳ 生成中...';
+    var params = new URLSearchParams({
+      gpa: $('r-gpa').value, major: major,
+      regions: $('r-regions').value || '不限',
+      budget: $('r-budget').value,
+      language: $('r-language').value || '待定'
+    });
+    try {
+      var resp = await api('POST', '/api/ai/report?' + params.toString());
+      var result = null;
+      for (var i = 0; i < 30; i++) {
+        await new Promise(function(r) { setTimeout(r, 1000); });
+        var d = await api('GET', '/api/ai/report/' + resp.report_id);
+        if (d.status === 'done') { result = d.result; break; }
+      }
+      if (!result) { alert('生成超时'); return; }
+      renderReport(result);
+    } catch(e) { alert('生成失败: ' + e.message); }
+    finally { btn.disabled = false; btn.textContent = '🚀 生成选校报告'; }
+  }
+
+  function renderReport(r) {
+    $('report-form-container').style.display = 'none';
+    var c = $('report-result-container');
+    c.style.display = 'block';
+
+    var topHtml = '';
+    if (r.top_recommendations) {
+      r.top_recommendations.forEach(function(u, i) {
+        var reasons = (u.match_reasons || []).join(' · ');
+        topHtml += '<div class="uni-rec" data-uni-id="' + u.id + '">' +
+          '<div class="rank-badge">' + (i+1) + '</div>' +
+          '<div style="flex:1"><h3>' + esc(u.cn) + ' <span style="color:var(--muted);font-weight:400;font-size:.85rem">' + esc(u.name) + '</span></h3>' +
+          '<div style="font-size:.85rem;color:var(--success);font-weight:600">匹配度 ' + u.score + '%</div>' +
+          '<div style="font-size:.8rem;color:var(--muted)">' + esc(reasons) + '</div></div>' +
+          '<div class="score-ring">' + u.score + '</div></div>';
+      });
+    }
+
+    var otherHtml = '';
+    if (r.other_options && r.other_options.length) {
+      otherHtml = '<h3 style="margin-top:20px">📋 其他可选</h3>';
+      r.other_options.forEach(function(u) {
+        otherHtml += '<div class="post-item" data-uni-id="' + u.id + '">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center">' +
+          '<div><strong>' + esc(u.cn) + '</strong> <span style="color:var(--muted);font-size:.8rem">' + esc(u.country || '') + '</span></div>' +
+          '<div style="color:var(--success);font-weight:600">' + u.score + '%</div></div></div>';
+      });
+    }
+
+    c.innerHTML =
+      '<div style="max-width:760px;margin:0 auto">' +
+      '<button class="back-btn" id="report-back-btn">← 重新选校</button>' +
+      '<h2>🎯 你的选校报告</h2>' +
+      '<p style="color:var(--muted);margin-bottom:20px">' + esc(r.summary) + '</p>' +
+      '<div style="background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:20px;border-left:4px solid var(--gold)">' +
+      '<div style="font-weight:600;margin-bottom:4px">你的条件</div>' +
+      '<div style="font-size:.85rem;color:var(--muted)">GPA:' + r.input.gpa + ' · 专业:' + esc(r.input.major) + ' · 预算:' + esc(r.input.budget) + '</div></div>' +
+      '<h3>🏆 推荐 TOP3</h3>' + topHtml + otherHtml +
+      '<div style="margin-top:20px;padding:14px;background:#fef3c7;border-radius:10px;font-size:.8rem;color:#92400e">' +
+      '⚠️ ' + esc(r.ai_notice || '本报告基于公开数据分析，仅供参考。') + '</div></div>';
+
+    // Bind click events for university items
+    c.querySelectorAll('[data-uni-id]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var uid = parseInt(el.getAttribute('data-uni-id'));
+        if (uid) showDetail(uid);
+      });
+    });
+    $('report-back-btn').addEventListener('click', function() {
+      $('report-form-container').style.display = 'block';
+      c.style.display = 'none';
+    });
+  }
+
+  // ── Bind All Events ──
+  function bindEvents() {
+    // Nav
+    $('nav-discover').addEventListener('click', function() { showPage('discover'); });
+    $('nav-rankings').addEventListener('click', function() { showPage('rankings'); });
+    $('nav-forum').addEventListener('click', function() { showPage('forum'); });
+    $('nav-report').addEventListener('click', function() { showPage('report'); });
+
+    // Search & filter
+    $('search-input').addEventListener('input', filterUniversities);
+    $('region-filter').addEventListener('change', filterUniversities);
+
+    // Auth
+    $('login-btn').addEventListener('click', showAuth);
+    $('close-auth-btn').addEventListener('click', hideAuth);
+    $('to-register-link').addEventListener('click', toggleAuth);
+    $('to-login-link').addEventListener('click', toggleAuth);
+    $('do-login-btn').addEventListener('click', doLogin);
+    $('do-register-btn').addEventListener('click', doRegister);
+
+    // Forum
+    $('new-post-btn').addEventListener('click', showNewPost);
+    $('cancel-post-btn').addEventListener('click', hideNewPost);
+    $('submit-post-btn').addEventListener('click', submitPost);
+
+    // Report
+    $('report-btn').addEventListener('click', generateReport);
+  }
+
+  // ── Init ──
+  updateUserUI();
+  bindEvents();
+  loadUniversities();
+})();
 </script>
 </body>
 </html>
