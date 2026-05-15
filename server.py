@@ -239,7 +239,7 @@ def auth_logout(creds: HTTPAuthorizationCredentials = Security(security)):
 # ── University API ──────────────────────────────────────
 
 @app.get("/api/universities")
-def list_universities(search: str = Query(""), region: str = Query("all")):
+def list_universities(search: str = Query(""), region: str = Query("all"), page: int = Query(1, ge=1), size: int = Query(30, ge=1, le=100)):
     db = get_db()
     q = "SELECT * FROM universities WHERE 1=1"
     params = []
@@ -248,7 +248,11 @@ def list_universities(search: str = Query(""), region: str = Query("all")):
     if search:
         q += " AND (cn LIKE ? OR name LIKE ? OR description LIKE ? OR loc LIKE ?)"
         s = f"%{search}%"; params.extend([s,s,s,s])
-    q += " ORDER BY rank ASC"
+    # count
+    cnt_q = q.replace("SELECT *", "SELECT COUNT(*)")
+    total = db.execute(cnt_q, params).fetchone()[0]
+    q += " ORDER BY rank ASC LIMIT ? OFFSET ?"
+    params.extend([size, (page - 1) * size])
     rows = db.execute(q, params).fetchall()
     result = []
     for r in rows:
@@ -257,7 +261,7 @@ def list_universities(search: str = Query(""), region: str = Query("all")):
         d['tags'] = parse_json_field(d['tags'])
         result.append(d)
     db.close()
-    return result
+    return {"total": total, "page": page, "size": size, "items": result}
 
 @app.get("/api/universities/{uni_id}")
 def get_university(uni_id: int):
