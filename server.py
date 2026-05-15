@@ -418,6 +418,17 @@ def create_comment(post_id: int, data: CreateCommentBody, user: dict = Depends(r
     db.close()
     return {"id": new_id, "message": "✅ 回复成功！"}
 
+@app.post("/api/forum/comments/{comment_id}/like")
+def like_comment(comment_id: int):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM forum_comments WHERE id=?", (comment_id,)).fetchone():
+        db.close(); raise HTTPException(404, "评论不存在")
+    db.execute("UPDATE forum_comments SET likes = likes + 1 WHERE id = ?", (comment_id,))
+    db.commit()
+    new_likes = db.execute("SELECT likes FROM forum_comments WHERE id=?", (comment_id,)).fetchone()[0]
+    db.close()
+    return {"likes": new_likes}
+
 @app.get("/api/forum/hot")
 def get_hot_topics(limit: int = Query(5)):
     db = get_db()

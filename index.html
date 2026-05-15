@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="/manifest.json">
+<title>UniPulse - 全球高校风向标</title>
+<meta name="description" content="全球高校评价与社区讨论平台 — 20,000+ 高校 · 150万真实评价 · 覆盖80个国家">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">跳过导航，直达内容</a>
+
+<nav role="navigation" aria-label="主导航">
+<div class="nav-inner">
+<div class="logo" role="button" tabindex="0" aria-label="UniPulse 首页" data-nav="discover">
+<div class="logo-icon" aria-hidden="true">U</div>UniPulse
+</div>
+<ul class="nav-links" id="navLinks" role="menubar">
+<li role="none"><button role="menuitem" data-page="discover" class="active" aria-current="page">🏫 发现</button></li>
+<li role="none"><button role="menuitem" data-page="rankings">📊 排名</button></li>
+<li role="none"><button role="menuitem" data-page="programs">🎓 专业</button></li>
+<li role="none"><button role="menuitem" data-page="forum">💬 论坛</button></li>
+</ul>
+<div class="nav-actions">
+<button class="btn btn-ghost" id="compareToggle" aria-label="对比列表">
+🔄 对比 <span id="compareCount" aria-label="已选数量">0</span>
+</button>
+<button class="btn btn-primary" id="loginBtn">登录</button>
+<button class="hamburger" id="hamburger" aria-label="打开菜单" aria-expanded="false">
+<span></span><span></span><span></span>
+</button>
+</div>
+</div>
+</nav>
+
+<main id="main-content">
+<section class="page active" id="page-discover" aria-labelledby="discover-title">
+<div class="discover-hero" role="banner">
+<h1 id="discover-title">找到最适合你的那所大学</h1>
+<p>20,000+ 高校 · 150万真实评价 · 覆盖80个国家</p>
+<form class="search-box" role="search" aria-label="搜索高校" onsubmit="return false">
+<label for="searchInput" class="sr-only">搜索大学名称、国家、专业</label>
+<input type="search" id="searchInput" placeholder="搜索大学名称、国家、专业..." autocomplete="off">
+<button type="submit" class="btn btn-primary">🔍 搜索</button>
+</form>
+</div>
+<div class="stats-bar" role="region" aria-label="平台数据概览">
+<div class="stat-card"><div class="stat-icon blue" aria-hidden="true">🏫</div><div><div class="stat-num">20,847</div><div class="stat-label">收录高校</div></div></div>
+<div class="stat-card"><div class="stat-icon gold" aria-hidden="true">⭐</div><div><div class="stat-num">1.5M</div><div class="stat-label">真实评价</div></div></div>
+<div class="stat-card"><div class="stat-icon green" aria-hidden="true">🌍</div><div><div class="stat-num">80+</div><div class="stat-label">覆盖国家</div></div></div>
+<div class="stat-card"><div class="stat-icon purple" aria-hidden="true">💬</div><div><div class="stat-num">320K</div><div class="stat-label">论坛帖子</div></div></div>
+</div>
+<div class="section-header">
+<h2>热门高校</h2>
+<div class="filter-tabs" id="regionFilters" role="radiogroup" aria-label="按地区筛选">
+<button class="filter-tab active" role="radio" aria-checked="true" data-region="all">全部</button>
+<button class="filter-tab" role="radio" aria-checked="false" data-region="北美">北美</button>
+<button class="filter-tab" role="radio" aria-checked="false" data-region="欧洲">欧洲</button>
+<button class="filter-tab" role="radio" aria-checked="false" data-region="亚洲">亚洲</button>
+<button class="filter-tab" role="radio" aria-checked="false" data-region="大洋洲">大洋洲</button>
+</div>
+</div>
+<div class="uni-grid" id="uniGrid" role="list" aria-label="高校列表"></div>
+<div class="no-results" id="noResults" style="display:none">
+<p>😕 当前筛选条件下没有匹配的高校</p>
+<button class="btn btn-ghost" onclick="window.State.resetFilters()">清空筛选条件</button>
+</div>
+</section>
+
+<section class="page" id="page-rankings" aria-labelledby="rankings-title">
+<div class="rankings-header">
+<h2 id="rankings-title">🏆 全球高校综合排名</h2>
+<p class="text-soft">基于学术、科研、声誉、学生满意度等多维度综合评分</p>
+<p class="methodology-link"><button class="btn-link" onclick="window._showToast('📊 评分方法论：综合评分 = 学术(25%) + 科研(20%) + 声誉(15%) + 校园(10%) + 学生关怀(10%) + 国际化(10%) + 性价比(5%) + 就业(5%)')">📋 查看评分方法论</button></p>
+</div>
+<div class="rank-table" role="table" aria-label="全球高校排名">
+<div class="rank-row head" role="row">
+<span role="columnheader">排名</span>
+<span role="columnheader">大学</span>
+<span role="columnheader">综合分</span>
+<span role="columnheader">趋势</span>
+<span role="columnheader">国家</span>
+<span role="columnheader">评价</span>
+</div>
+<div id="rankList" role="rowgroup"></div>
+</div>
+</section>
+
+<section class="page" id="page-programs" aria-labelledby="programs-title">
+<div class="section-header"><h2 id="programs-title">🎓 学科专业排名</h2></div>
+<div class="programs-grid" id="programsGrid"></div>
+</section>
+
+<section class="page" id="page-forum" aria-labelledby="forum-title">
+<div class="forum-layout">
+<div class="forum-sidebar" role="navigation" aria-label="话题分类">
+<h4>话题分类</h4>
+<ul class="cat-list" id="catList" role="listbox">
+<li role="option" aria-selected="true" class="active" data-cat="all">📋 全部话题 <span class="cat-count">128</span></li>
+<li role="option" aria-selected="false" data-cat="人文关怀">🤝 人文关怀 <span class="cat-count">34</span></li>
+<li role="option" aria-selected="false" data-cat="校园生活">🏠 校园生活 <span class="cat-count">28</span></li>
+<li role="option" aria-selected="false" data-cat="心理健康">💚 心理健康 <span class="cat-count">19</span></li>
+<li role="option" aria-selected="false" data-cat="学术氛围">📚 学术氛围 <span class="cat-count">22</span></li>
+<li role="option" aria-selected="false" data-cat="就业发展">💼 就业发展 <span class="cat-count">15</span></li>
+<li role="option" aria-selected="false" data-cat="国际交流">🌍 国际交流 <span class="cat-count">10</span></li>
+</ul>
+</div>
+<div class="forum-main">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h2 id="forum-title">💬 社区讨论</h2>
+<button class="btn btn-primary" id="newPostBtn">+ 发布话题</button>
+</div>
+<div id="forumPosts"></div>
+</div>
+<div class="forum-hot" aria-label="热门话题">
+<h4>🔥 热门话题</h4>
+</div>
+</div>
+</section>
+</main>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="modal">
+<div class="modal-header">
+<div id="modalHero"></div>
+<button class="modal-close" aria-label="关闭详情" id="modalClose">✕</button>
+</div>
+<div class="modal-body" id="modalBody"></div>
+</div>
+</div>
+
+<!-- Compare Bar -->
+<div class="compare-bar" id="compareBar" role="region" aria-label="高校对比" aria-live="polite">
+<span class="compare-label">对比列表：</span>
+<div class="chips" id="compareChips"></div>
+<button class="btn btn-gold" id="doCompareBtn">开始对比</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="/js/main.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); });
+}
+</script>
+</body>
+</html>
