@@ -1,6 +1,6 @@
 """
-UniPulse Backend - FastAPI + SQLite + User Auth
-一键启动：python -m uvicorn server:app --host 127.0.0.1 --port 9999
+UniPulse Backend v2 - 选校·选专业·看就业
+FastAPI + SQLite + User Auth + Employment Data + Enhanced Forum
 """
 import sqlite3, json, os, sys, hashlib, secrets
 from pathlib import Path
@@ -75,6 +75,8 @@ class CreatePostBody(BaseModel):
     category: str = "全部话题"
     content: str
     tags: list = Field(default_factory=list)
+    uni_id: Optional[int] = None
+    program_name: Optional[str] = None
 
 class CreateCommentBody(BaseModel):
     text: str = Field(..., min_length=1)
@@ -125,13 +127,27 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT, icon TEXT, ranking TEXT
         );
+        CREATE TABLE IF NOT EXISTS uni_programs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uni_id INTEGER NOT NULL,
+            program_name TEXT NOT NULL,
+            salary_avg INTEGER,
+            salary_entry INTEGER,
+            employment_rate REAL,
+            pressure INTEGER,
+            prospects INTEGER,
+            description TEXT,
+            FOREIGN KEY (uni_id) REFERENCES universities(id) ON DELETE CASCADE
+        );
         CREATE TABLE IF NOT EXISTS forum_posts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
             title TEXT NOT NULL, category TEXT DEFAULT '全部话题',
             author TEXT DEFAULT '匿名用户',
             content TEXT,
-            views INTEGER DEFAULT 0, tags TEXT DEFAULT '[]',
+            views INTEGER DEFAULT 0, likes INTEGER DEFAULT 0,
+            tags TEXT DEFAULT '[]',
+            uni_id INTEGER, program_name TEXT,
             created_at TEXT DEFAULT (datetime('now','localtime'))
         );
         CREATE TABLE IF NOT EXISTS forum_comments (
@@ -144,29 +160,37 @@ def init_db():
         );
         CREATE INDEX IF NOT EXISTS idx_comments_post ON forum_comments(post_id);
         CREATE INDEX IF NOT EXISTS idx_posts_category ON forum_posts(category);
+        CREATE INDEX IF NOT EXISTS idx_uni_programs_uni ON uni_programs(uni_id);
+        CREATE INDEX IF NOT EXISTS idx_uni_programs_name ON uni_programs(program_name);
     """)
 
-    # Ensure role column and admin user exist
-    try:
-        db.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'")
-    except Exception:
-        pass
+    # Migrate: add columns if missing
+    try: db.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'")
+    except: pass
+    try: db.execute("ALTER TABLE forum_posts ADD COLUMN likes INTEGER DEFAULT 0")
+    except: pass
+    try: db.execute("ALTER TABLE forum_posts ADD COLUMN uni_id INTEGER")
+    except: pass
+    try: db.execute("ALTER TABLE forum_posts ADD COLUMN program_name TEXT")
+    except: pass
+
     if not db.execute("SELECT 1 FROM users WHERE role='admin'").fetchone():
         admin_hash = hash_pw('admin123')
         try:
             db.execute("INSERT INTO users(username,email,password_hash,role) VALUES('admin','admin@unipulse.com',?,'admin')", (admin_hash,))
-        except Exception:
+        except:
             db.execute("UPDATE users SET role='admin' WHERE id=1")
     db.commit()
 
     if db.execute("SELECT COUNT(*) FROM universities").fetchone()[0] == 0:
         seed_data(db)
+    if db.execute("SELECT COUNT(*) FROM uni_programs").fetchone()[0] == 0:
+        seed_employment(db)
     db.commit()
     db.close()
 
 def seed_data(db: sqlite3.Connection):
     from seed import UNIVERSITIES, PROGRAMS, FORUM_POSTS, FORUM_COMMENTS
-
     for u in UNIVERSITIES:
         db.execute("INSERT INTO universities VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (u['id'],u['name'],u['cn'],u['loc'],u['region'],u['country'],
@@ -175,24 +199,26 @@ def seed_data(db: sqlite3.Connection):
              json.dumps(u['metrics'],ensure_ascii=False),
              json.dumps(u['tags'],ensure_ascii=False),
              u.get('description','')))
-
     for p in PROGRAMS:
         db.execute("INSERT INTO programs(name,icon,ranking) VALUES(?,?,?)",
             (p['name'],p['icon'],json.dumps(p['univs'],ensure_ascii=False)))
-
     for fp in FORUM_POSTS:
-        db.execute("""INSERT INTO forum_posts(id,user_id,title,category,author,content,views,tags,created_at)
-                     VALUES(?,?,?,?,?,?,?,?,?)""",
+        db.execute("INSERT INTO forum_posts(id,user_id,title,category,author,content,views,tags,created_at) VALUES(?,?,?,?,?,?,?,?,?)",
             (fp['id'], fp.get('user_id'), fp['title'], fp['category'],
              fp['author'], fp['content'], fp['views'],
              json.dumps(fp['tags'],ensure_ascii=False),
              fp.get('time','datetime("now","localtime")')))
-
     for fc in FORUM_COMMENTS:
-        db.execute("""INSERT INTO forum_comments(id,post_id,author,text,likes,created_at)
-                     VALUES(?,?,?,?,?,?)""",
+        db.execute("INSERT INTO forum_comments(id,post_id,author,text,likes,created_at) VALUES(?,?,?,?,?,?)",
             (fc['id'],fc['post_id'],fc['author'],fc['text'],fc['likes'],
              fc.get('time','datetime("now","localtime")')))
+
+def seed_employment(db: sqlite3.Connection):
+    from employment_data import UNI_PROGRAMS
+    for ep in UNI_PROGRAMS:
+        db.execute("INSERT INTO uni_programs(uni_id,program_name,salary_avg,salary_entry,employment_rate,pressure,prospects,description) VALUES(?,?,?,?,?,?,?,?)",
+            (ep['uni_id'], ep['program_name'], ep['salary_avg'], ep['salary_entry'],
+             ep['employment_rate'], ep['pressure'], ep['prospects'], ep['description']))
 
 # ── App ─────────────────────────────────────────────────
 
@@ -201,7 +227,7 @@ async def lifespan(app: FastAPI):
     init_db()
     yield
 
-app = FastAPI(title="UniPulse API", lifespan=lifespan)
+app = FastAPI(title="UniPulse API v2", lifespan=lifespan)
 app.add_middleware(CORSMiddleware,
     allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
@@ -221,7 +247,6 @@ def parse_json_field(v):
 @app.post("/api/auth/register")
 def auth_register(body: RegisterBody):
     db = get_db()
-    # check duplicate
     if db.execute("SELECT 1 FROM users WHERE email=?", (body.email,)).fetchone():
         db.close(); raise HTTPException(400, "邮箱已被注册")
     if db.execute("SELECT 1 FROM users WHERE username=?", (body.username,)).fetchone():
@@ -263,16 +288,17 @@ def auth_logout(creds: HTTPAuthorizationCredentials = Security(security)):
 # ── University API ──────────────────────────────────────
 
 @app.get("/api/universities")
-def list_universities(search: str = Query(""), region: str = Query("all"), page: int = Query(1, ge=1), size: int = Query(30, ge=1, le=100)):
+def list_universities(search: str = Query(""), region: str = Query("all"), country: str = Query(""), page: int = Query(1, ge=1), size: int = Query(30, ge=1, le=100)):
     db = get_db()
     q = "SELECT * FROM universities WHERE 1=1"
     params = []
     if region and region != "all":
         q += " AND region = ?"; params.append(region)
+    if country:
+        q += " AND country = ?"; params.append(country)
     if search:
         q += " AND (cn LIKE ? OR name LIKE ? OR description LIKE ? OR loc LIKE ?)"
         s = f"%{search}%"; params.extend([s,s,s,s])
-    # count
     cnt_q = q.replace("SELECT *", "SELECT COUNT(*)")
     total = db.execute(cnt_q, params).fetchone()[0]
     q += " ORDER BY rank ASC LIMIT ? OFFSET ?"
@@ -291,12 +317,68 @@ def list_universities(search: str = Query(""), region: str = Query("all"), page:
 def get_university(uni_id: int):
     db = get_db()
     r = db.execute("SELECT * FROM universities WHERE id = ?", (uni_id,)).fetchone()
-    db.close()
-    if not r: raise HTTPException(404, "高校不存在")
+    if not r:
+        db.close(); raise HTTPException(404, "高校不存在")
     d = row_to_dict(r)
     d['metrics'] = parse_json_field(d['metrics'])
     d['tags'] = parse_json_field(d['tags'])
+    # attach employment data
+    progs = db.execute("SELECT * FROM uni_programs WHERE uni_id=?", (uni_id,)).fetchall()
+    d['programs'] = [dict(p) for p in progs]
+    db.close()
     return d
+
+@app.get("/api/universities/{uni_id}/programs")
+def get_uni_programs(uni_id: int):
+    db = get_db()
+    rows = db.execute("SELECT * FROM uni_programs WHERE uni_id=?", (uni_id,)).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+# ── Employment / Majors API ─────────────────────────────
+
+@app.get("/api/majors/overview")
+def majors_overview():
+    """按专业聚合全站就业数据"""
+    db = get_db()
+    rows = db.execute("""
+        SELECT program_name,
+               COUNT(*) as uni_count,
+               ROUND(AVG(salary_avg)) as avg_salary,
+               ROUND(AVG(salary_entry)) as avg_entry,
+               ROUND(AVG(employment_rate),1) as avg_employment,
+               ROUND(AVG(pressure),1) as avg_pressure,
+               ROUND(AVG(prospects),1) as avg_prospects
+        FROM uni_programs
+        GROUP BY program_name
+        ORDER BY avg_salary DESC
+    """).fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+@app.get("/api/majors/{program_name}")
+def get_major_detail(program_name: str):
+    """某专业在各大学的就业数据对比"""
+    db = get_db()
+    rows = db.execute("""
+        SELECT up.*, u.cn as uni_cn, u.name as uni_name, u.country, u.rank
+        FROM uni_programs up
+        JOIN universities u ON up.uni_id = u.id
+        WHERE up.program_name = ?
+        ORDER BY up.salary_avg DESC
+    """, (program_name,)).fetchall()
+    db.close()
+    if not rows:
+        raise HTTPException(404, f"未找到专业「{program_name}」的数据")
+    return [dict(r) for r in rows]
+
+@app.get("/api/majors")
+def list_majors():
+    """所有专业名称列表"""
+    db = get_db()
+    rows = db.execute("SELECT DISTINCT program_name FROM uni_programs ORDER BY program_name").fetchall()
+    db.close()
+    return [r['program_name'] for r in rows]
 
 # ── Ranking API ──────────────────────────────────────────
 
@@ -346,26 +428,22 @@ def get_programs():
     db.close()
     return result
 
-# ── Forum API ───────────────────────────────────────────
+# ── Forum API (Enhanced) ───────────────────────────────
 
 @app.get("/api/forum/categories")
 def get_forum_categories():
     db = get_db()
     rows = db.execute("SELECT category as cat, COUNT(*) as count FROM forum_posts GROUP BY category").fetchall()
     cats = [
-        {"key":"all","label":"全部","count":0},
-        {"key":"心理健康","label":"💚 心理健康","count":0},
-        {"key":"校园生活","label":"🏠 校园生活","count":0},
-        {"key":"学术氛围","label":"📚 学术氛围","count":0},
-        {"key":"就业发展","label":"💼 就业发展","count":0},
-        {"key":"人文关怀","label":"🤝 人文关怀","count":0},
+        {"key":"all","label":"🔥 全部","count":0},
+        {"key":"选校咨询","label":"🏫 选校咨询","count":0},
+        {"key":"专业对比","label":"📊 专业对比","count":0},
+        {"key":"就业前景","label":"💼 就业前景","count":0},
         {"key":"留学申请","label":"✈️ 留学申请","count":0},
-        {"key":"专业选择","label":"🎯 专业选择","count":0},
-        {"key":"院校对比","label":"⚖️ 院校对比","count":0},
+        {"key":"考研交流","label":"📖 考研交流","count":0},
+        {"key":"校园生活","label":"🏠 校园生活","count":0},
         {"key":"奖学金","label":"💰 奖学金","count":0},
-        {"key":"实习","label":"🏢 实习","count":0},
-        {"key":"研究生","label":"🎓 研究生","count":0},
-        {"key":"博士","label":"🔬 博士","count":0},
+        {"key":"实习经验","label":"🏢 实习经验","count":0},
     ]
     total = 0
     cat_map = {r['cat']: r['count'] for r in rows}
@@ -378,27 +456,44 @@ def get_forum_categories():
     return cats
 
 @app.get("/api/forum/posts")
-def list_forum_posts(category: str = Query("all"), search: str = Query(""), limit: int = Query(50)):
+def list_forum_posts(category: str = Query("all"), search: str = Query(""),
+                     uni_id: int = Query(None), program_name: str = Query(""),
+                     sort: str = Query("new"), page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100)):
     db = get_db()
-    q = "SELECT * FROM forum_posts WHERE 1=1"
+    q = "SELECT p.* FROM forum_posts p WHERE 1=1"
     params = []
     if category and category != "all":
-        q += " AND category = ?"; params.append(category)
+        q += " AND p.category = ?"; params.append(category)
     if search:
-        q += " AND (title LIKE ? OR content LIKE ?)"
+        q += " AND (p.title LIKE ? OR p.content LIKE ?)"
         s = f"%{search}%"; params.extend([s,s])
-    q += " ORDER BY id DESC LIMIT ?"; params.append(limit)
+    if uni_id:
+        q += " AND p.uni_id = ?"; params.append(uni_id)
+    if program_name:
+        q += " AND p.program_name = ?"; params.append(program_name)
+    # count
+    cnt_q = q.replace("SELECT p.*", "SELECT COUNT(*)")
+    total = db.execute(cnt_q, params).fetchone()[0]
+    # sort
+    if sort == "hot":
+        q += " ORDER BY (p.views + p.likes*3) DESC"
+    else:
+        q += " ORDER BY p.id DESC"
+    q += " LIMIT ? OFFSET ?"
+    params.extend([size, (page-1)*size])
     rows = db.execute(q, params).fetchall()
     result = []
     for r in rows:
         d = row_to_dict(r)
         d['tags'] = parse_json_field(d['tags'])
-        d['cat'] = d['category']
-        d['time'] = d['created_at']
         d['replies'] = db.execute("SELECT COUNT(*) FROM forum_comments WHERE post_id=?", (d['id'],)).fetchone()[0]
+        # attach uni name if linked
+        if d.get('uni_id'):
+            uni = db.execute("SELECT cn FROM universities WHERE id=?", (d['uni_id'],)).fetchone()
+            d['uni_cn'] = uni['cn'] if uni else None
         result.append(d)
     db.close()
-    return result
+    return {"total": total, "page": page, "size": size, "items": result}
 
 @app.get("/api/forum/posts/{post_id}")
 def get_forum_post(post_id: int):
@@ -411,9 +506,10 @@ def get_forum_post(post_id: int):
     comments = db.execute("SELECT * FROM forum_comments WHERE post_id = ? ORDER BY id ASC", (post_id,)).fetchall()
     result = row_to_dict(post)
     result['tags'] = parse_json_field(result['tags'])
-    result['cat'] = result['category']
-    result['time'] = result['created_at']
     result['comments'] = [row_to_dict(c) for c in comments]
+    if result.get('uni_id'):
+        uni = db.execute("SELECT cn FROM universities WHERE id=?", (result['uni_id'],)).fetchone()
+        result['uni_cn'] = uni['cn'] if uni else None
     db.close()
     return result
 
@@ -422,12 +518,24 @@ def create_post(data: CreatePostBody, user: dict = Depends(require_user)):
     db = get_db()
     tags = json.dumps(data.tags, ensure_ascii=False)
     cur = db.execute(
-        "INSERT INTO forum_posts(user_id,title,category,author,content,tags) VALUES(?,?,?,?,?,?)",
-        (user['id'], data.title, data.category, user['username'], data.content, tags))
+        "INSERT INTO forum_posts(user_id,title,category,author,content,tags,uni_id,program_name) VALUES(?,?,?,?,?,?,?,?)",
+        (user['id'], data.title, data.category, user['username'], data.content, tags,
+         data.uni_id, data.program_name))
     db.commit()
     new_id = cur.lastrowid
     db.close()
     return {"id": new_id, "message": "✅ 发帖成功！"}
+
+@app.post("/api/forum/posts/{post_id}/like")
+def like_post(post_id: int):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM forum_posts WHERE id=?", (post_id,)).fetchone():
+        db.close(); raise HTTPException(404, "帖子不存在")
+    db.execute("UPDATE forum_posts SET likes = likes + 1 WHERE id = ?", (post_id,))
+    db.commit()
+    new_likes = db.execute("SELECT likes FROM forum_posts WHERE id=?", (post_id,)).fetchone()[0]
+    db.close()
+    return {"likes": new_likes}
 
 @app.post("/api/forum/posts/{post_id}/comments")
 def create_comment(post_id: int, data: CreateCommentBody, user: dict = Depends(require_user)):
@@ -454,10 +562,10 @@ def like_comment(comment_id: int):
     return {"likes": new_likes}
 
 @app.get("/api/forum/hot")
-def get_hot_topics(limit: int = Query(5)):
+def get_hot_topics(limit: int = Query(10)):
     db = get_db()
-    rows = db.execute("SELECT title as text, views FROM forum_posts ORDER BY views DESC LIMIT ?", (limit,)).fetchall()
-    result = [{"text": r['text'], "views": r['views']} for r in rows]
+    rows = db.execute("SELECT id, title, views, likes, category FROM forum_posts ORDER BY (views + likes*3) DESC LIMIT ?", (limit,)).fetchall()
+    result = [dict(r) for r in rows]
     db.close()
     return result
 
@@ -471,11 +579,12 @@ def admin_stats(_: dict = Depends(require_admin)):
     comments = db.execute("SELECT COUNT(*) FROM forum_comments").fetchone()[0]
     unis = db.execute("SELECT COUNT(*) FROM universities").fetchone()[0]
     programs_cnt = db.execute("SELECT COUNT(*) FROM programs").fetchone()[0]
+    emp_cnt = db.execute("SELECT COUNT(*) FROM uni_programs").fetchone()[0]
     recent = db.execute("SELECT COUNT(*) FROM users WHERE created_at > datetime('now','localtime','-7 days')").fetchone()[0]
     recent_posts = db.execute("SELECT COUNT(*) FROM forum_posts WHERE created_at > datetime('now','localtime','-7 days')").fetchone()[0]
     db.close()
     return {"users": users, "posts": posts, "comments": comments,
-            "universities": unis, "programs": programs_cnt,
+            "universities": unis, "programs": programs_cnt, "employment_records": emp_cnt,
             "recent_users": recent, "recent_posts": recent_posts}
 
 @app.get("/api/admin/users")
@@ -592,69 +701,90 @@ def admin_update_uni(uni_id: int, data: dict = None, _: dict = Depends(require_a
     db.commit(); db.close()
     return {"ok": True}
 
+@app.get("/api/admin/employment")
+def admin_list_employment(page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100), _: dict = Depends(require_admin)):
+    db = get_db()
+    total = db.execute("SELECT COUNT(*) FROM uni_programs").fetchone()[0]
+    rows = db.execute("""
+        SELECT up.*, u.cn as uni_cn FROM uni_programs up
+        LEFT JOIN universities u ON up.uni_id = u.id
+        ORDER BY up.id LIMIT ? OFFSET ?
+    """, (size, (page-1)*size)).fetchall()
+    db.close()
+    return {"total": total, "items": [dict(r) for r in rows]}
+
+@app.delete("/api/admin/employment/{ep_id}")
+def admin_delete_employment(ep_id: int, _: dict = Depends(require_admin)):
+    db = get_db()
+    if not db.execute("SELECT 1 FROM uni_programs WHERE id=?", (ep_id,)).fetchone():
+        db.close(); raise HTTPException(404, "记录不存在")
+    db.execute("DELETE FROM uni_programs WHERE id=?", (ep_id,))
+    db.commit(); db.close()
+    return {"ok": True}
+
 # ── Health ──────────────────────────────────────────────
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "time": datetime.now().isoformat()}
+    return {"status": "ok", "version": "2.0", "time": datetime.now().isoformat()}
+
+# ── Countries/Regions API ───────────────────────────────
+
+@app.get("/api/countries")
+def list_countries():
+    db = get_db()
+    rows = db.execute("SELECT DISTINCT country FROM universities ORDER BY country").fetchall()
+    db.close()
+    return [r['country'] for r in rows]
+
+@app.get("/api/regions")
+def list_regions():
+    db = get_db()
+    rows = db.execute("SELECT DISTINCT region FROM universities WHERE region IS NOT NULL ORDER BY region").fetchall()
+    db.close()
+    return [r['region'] for r in rows]
 
 # ── AI Report generation (background) ──────────────────
 
 import threading, uuid, time
 
-# In-memory job store
 report_jobs: dict = {}
 report_lock = threading.Lock()
 
 def generate_ai_report(report_id: str, gpa: float, major: str, regions: list, budget: str, language: str):
-    """Background worker: generate university recommendations."""
-    # Import inside to avoid circular issues
     from seed import UNIVERSITIES
-    
-    # Score each university
     results = []
     for u in UNIVERSITIES:
         score = 0
         reasons = []
-        
-        # GPA fit (max 40 points)
         rank = u.get('rank', 999)
         if rank <= 10: score += 40
         elif rank <= 20: score += 30
         elif rank <= 50: score += 20
         elif rank <= 100: score += 10
         else: score += 5
-        reasons.append(f"QS排名{rank}，")
-        
-        # Major match — first determine user's category, then match uni description
+        reasons.append("QS排名" + str(rank))
         desc_lower = u.get('description', '').lower()
         major_lower = major.lower()
         major_categories = {
             '计算机/软件': ['cs','computer','软件','计算机','编程','ai','人工智能','信息科学','数据','算法','machine learning','software','信息技术'],
             '商科': ['business','management','economics','finance','商','管理','经济','金融','会计','marketing','mba'],
             '工程': ['engineering','mechanical','electrical','工科','工程','制造','电子','机械','土木','建筑','civil','aerospace','航空'],
-            '医学/健康': ['medicine','medical','health','临床','医学','健康','护理','药学','nursing','pharmacy','护理'],
+            '医学/健康': ['medicine','medical','health','临床','医学','健康','护理','药学','nursing','pharmacy'],
             '艺术/设计': ['art','design','architecture','music','艺术','设计','音乐','建筑','美术','fashion','创意'],
             '法律': ['law','legal','法学','法律','司法','justice'],
             '理科': ['physics','chemistry','biology','science','物理','化学','生物','数学','统计','mathematics','statistics','自然'],
         }
-        # Step 1: find user's category
         user_cat = None
         for cat, keywords in major_categories.items():
             if any(k in major_lower for k in keywords):
-                user_cat = (cat, keywords)
-                break
-        # Step 2: check if uni matches user's category
+                user_cat = (cat, keywords); break
         if user_cat:
             cat_name, cat_keywords = user_cat
             if any(k in desc_lower for k in cat_keywords):
-                score += 20
-                reasons.append(f"{cat_name}方向突出")
+                score += 20; reasons.append(cat_name + "方向突出")
             else:
-                score += 10
-                reasons.append(f"综合实力强（{cat_name}方向待确认）")
-        
-        # Budget check
+                score += 10; reasons.append("综合实力强")
         budget_ok = False
         if budget in ['0-20万', '20万以下']:
             budget_ok = u.get('country','') in ['中国', '日本', '新加坡', '韩国', '马来西亚']
@@ -664,13 +794,9 @@ def generate_ai_report(report_id: str, gpa: float, major: str, regions: list, bu
             budget_ok = True
         if budget_ok: score += 20
         else: reasons.append("⚠️ 费用可能超标")
-        
-        # Region preference
         if regions and regions != ['不限']:
-            region_ok = u.get('region','') in regions or u.get('country','') in regions
-            if region_ok: score += 15
-            else: reasons.append(f"不在首选地区")
-        
+            if u.get('region','') in regions or u.get('country','') in regions:
+                score += 15
         results.append({
             'id': u['id'], 'name': u['name'], 'cn': u['cn'],
             'country': u.get('country', ''), 'loc': u.get('loc', ''),
@@ -678,22 +804,17 @@ def generate_ai_report(report_id: str, gpa: float, major: str, regions: list, bu
             'match_reasons': reasons[:4],
             'tuition_hint': u.get('country', '')
         })
-    
     results.sort(key=lambda x: x['score'], reverse=True)
-    top3 = results[:3]
-    mid = results[3:10]
-    
     report = {
         'report_id': report_id,
         'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M'),
         'input': {'gpa': gpa, 'major': major, 'regions': regions, 'budget': budget, 'language': language},
-        'summary': f"基于您的{gpa} GPA + {major}专业偏好，为您精选{len(results)}所院校，匹配度最高的前3所如下：",
-        'top_recommendations': top3,
-        'other_options': mid,
+        'summary': "基于您的" + str(gpa) + " GPA + " + major + "专业偏好，为您精选" + str(len(results)) + "所院校",
+        'top_recommendations': results[:3],
+        'other_options': results[3:10],
         'total_matched': len(results),
-        'ai_notice': "本报告基于公开数据综合分析，仅供参考。选校决策请结合个人情况综合判断，UniPulse 不对录取结果承担责任。"
+        'ai_notice': "本报告基于公开数据综合分析，仅供参考。"
     }
-    
     with report_lock:
         report_jobs[report_id] = {'status': 'done', 'result': report}
 
@@ -702,7 +823,7 @@ async def create_ai_report(
     background_tasks: BackgroundTasks,
     gpa: float = Query(..., ge=0, le=5),
     major: str = Query("..."),
-    regions: str = Query("不限"),    # comma-separated
+    regions: str = Query("不限"),
     budget: str = Query("不限"),
     language: str = Query("待定"),
 ):
@@ -712,7 +833,7 @@ async def create_ai_report(
     with report_lock:
         report_jobs[report_id] = {'status': 'processing', 'result': None}
     background_tasks.add_task(generate_ai_report, report_id, gpa, major, region_list, budget, language)
-    return {'report_id': report_id, 'status': 'processing', 'poll_url': f'/api/ai/report/{report_id}'}
+    return {'report_id': report_id, 'status': 'processing', 'poll_url': '/api/ai/report/' + report_id}
 
 @app.get("/api/ai/report/{report_id}")
 async def get_ai_report(report_id: str):
@@ -725,7 +846,6 @@ async def get_ai_report(report_id: str):
 
 @app.get("/api/ai/wait/{report_id}")
 async def wait_ai_report(report_id: str, timeout: int = Query(30)):
-    """Poll until report is ready (max 30s)."""
     for _ in range(timeout):
         with report_lock:
             job = report_jobs.get(report_id)
@@ -734,7 +854,6 @@ async def wait_ai_report(report_id: str, timeout: int = Query(30)):
             return job['result']
         time.sleep(1)
     raise HTTPException(504, "报告生成超时，请稍后重试")
-
 
 # ── Static files (frontend) ─────────────────────────────
 
@@ -759,12 +878,10 @@ if DIST.exists():
 else:
     @app.get("/")
     async def root():
-        return {"message": "UniPulse API running. Run `npx vite build` first.", "api": True}
-
-# ── Main ────────────────────────────────────────────────
+        return {"message": "UniPulse API v2 running.", "api": True}
 
 if __name__ == "__main__":
-    print("🚀 UniPulse 启动中...")
-    print(f"   API: http://localhost:9999/api/health")
-    print(f"   前端: http://localhost:9999")
-    uvicorn.run(app, host="127.0.0.1", port=9999, log_level="info")
+    print("UniPulse v2 - 选校·选专业·看就业")
+    print("  API: http://localhost:9999/api/health")
+    print("  前端: http://localhost:9999")
+    uvicorn.run(app, host="0.0.0.0", port=9999, log_level="info")
