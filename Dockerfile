@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY server.py seed.py ./
+COPY server.py seed.py employment_data.py ./
 COPY dist/ ./dist/
 
 # Render sets PORT env var
